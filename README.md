@@ -3,7 +3,7 @@
 
 ![PreRelease](https://img.shields.io/badge/Version-Pre--Release-orange?logo=git&logoColor=f5f5f5) ![MIT](https://img.shields.io/badge/License-MIT-green?logo=opensourcehardware&logoColor=f5f5f5) [![Commit Activity](https://img.shields.io/github/commit-activity/w/Orama-Engine/Orama?label=Commit%20Activity&logo=github)](https://github.com/Orama-Engine/Orama)
 
-C# 14 Game Engine built around Modularity & Modernity.
+Free & Open Source Game Engine built for lovers of modern C#.
 
 > [!WARNING]
 > Orama is a Pre-Release engine. It's API will have **breaking changes**.
