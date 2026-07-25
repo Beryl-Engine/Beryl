@@ -9,7 +9,7 @@ Free & Open Source Game Engine built for lovers of modern C#.
 > Orama is a Pre-Release engine. It's API will have **breaking changes**.
 
 ## About
-Orama is a cross-platform, MIT licensed game engine built around modern C#. It's designed to give users an engine that they'll enjoy using, no messy abstractions, no interop artifacts, and no licensing concerns.
+Orama is a cross-platform, MIT licensed, 3D-Focused game engine built around modern C#. It's designed to give fans of C# an engine that they'll enjoy using, no messy abstractions, no interop artifacts, and no licensing concerns.
 
 ## Getting Started
 Once you have a `.csproj` that depends on all Orama libraries your game will use, you can start the engine through an entry-point that look a bit like this:
