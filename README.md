@@ -3,13 +3,13 @@
 
 ![PreRelease](https://img.shields.io/badge/Version-Pre--Release-orange?logo=git&logoColor=f5f5f5) ![MIT](https://img.shields.io/badge/License-MIT-green?logo=opensourcehardware&logoColor=f5f5f5) [![Commit Activity](https://img.shields.io/github/commit-activity/w/Orama-Engine/Orama?label=Commit%20Activity&logo=github)](https://github.com/Orama-Engine/Orama)
 
-The C# 14 Virtual-Reality Game Engine built around the modern .NET ecosystem.
+C# 14 Game Engine built around Modularity & Modernity.
 
 > [!WARNING]
 > Orama is a Pre-Release engine. It's API will have **breaking changes**.
 
 ## About
-Orama is a cross-platform, MIT licensed, Virtual Reality focused game engine built around modern C#. It's designed to give creators an engine that they'll enjoy using, no messy abstractions, no interop artifacts, and no licensing concerns.
+Orama is a cross-platform, MIT licensed game engine built around modern C#. It's designed to give users an engine that they'll enjoy using, no messy abstractions, no interop artifacts, and no licensing concerns.
 
 ## Getting Started
 Once you have a `.csproj` that depends on all Orama libraries your game will use, you can start the engine through an entry-point that look a bit like this:
@@ -47,9 +47,6 @@ static void Main(string[] args)
 ```
 
 ## Features
-### Virtual Reality
-Orama was made specifically for Virtual Reality with no workarounds and no retrofitting.
-
 ### Extreme Modularity
 All engine subsystems have their lifecycle hooked into the `Module` system. Because of this, subsystems can be arbitrarily disabled, profiled, or singled out for debugging.
 
