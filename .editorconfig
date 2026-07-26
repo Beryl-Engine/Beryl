@@ -10,7 +10,7 @@ indent_style = tab
 tab_width = 4
 
 # File Header
-file_header_template = This file is part of the Orama Game Engine.\nLicensed under the MIT license. (https://github.com/Orama-Engine/Orama/blob/main/LICENSE)
+file_header_template = This file is part of the Beryl Game Engine.\nLicensed under the MIT license. (https://github.com/Beryl-Engine/Beryl/blob/main/LICENSE)
 dotnet_diagnostic.IDE0073.severity = error
 
 # Naming

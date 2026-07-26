@@ -1,0 +1,37 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="SixLabors.ImageSharp" Version="3.1.11" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Modules\Beryl.Assemblies\Beryl.Assemblies.csproj" />
+    <ProjectReference Include="..\..\Modules\Beryl.Audio\Beryl.Audio.csproj" />
+    <ProjectReference Include="..\..\Modules\Beryl.GUI\Beryl.GUI.csproj" />
+    <ProjectReference Include="..\..\Modules\Beryl.Input\Beryl.Input.csproj" />
+    <ProjectReference Include="..\..\Modules\Beryl.Physics\Beryl.Physics.csproj" />
+    <ProjectReference Include="..\..\Modules\Beryl.Rendering\Beryl.Rendering.csproj" />
+    <ProjectReference Include="..\..\Modules\Beryl.Scenes\Beryl.Scenes.csproj" />
+    <ProjectReference Include="..\..\Modules\Beryl.VirtualReality\Beryl.VirtualReality.csproj" />
+    <ProjectReference Include="..\..\Beryl.Common\Beryl.Common.csproj" />
+    <ProjectReference Include="..\..\Beryl.Math\Beryl.Math.csproj" />
+    <ProjectReference Include="..\..\Beryl.Serialization\Beryl.Serialization.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="Assets\PrimitiveCube.fbx">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Assets\TranslateGizmo.fbx">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+</Project>

@@ -1,18 +1,18 @@
-# Orama Engine
-<img src="banner.png" alt="Orama Logo" width="300">
+# Beryl Engine
+<img src="banner.png" alt="Beryl Logo" width="300">
 
-![PreRelease](https://img.shields.io/badge/Version-Pre--Release-orange?logo=git&logoColor=f5f5f5) ![MIT](https://img.shields.io/badge/License-MIT-green?logo=opensourcehardware&logoColor=f5f5f5) [![Commit Activity](https://img.shields.io/github/commit-activity/w/Orama-Engine/Orama?label=Commit%20Activity&logo=github)](https://github.com/Orama-Engine/Orama)
+![PreRelease](https://img.shields.io/badge/Version-Pre--Release-orange?logo=git&logoColor=f5f5f5) ![MIT](https://img.shields.io/badge/License-MIT-green?logo=opensourcehardware&logoColor=f5f5f5) [![Commit Activity](https://img.shields.io/github/commit-activity/w/Beryl-Engine/Beryl?label=Commit%20Activity&logo=github)](https://github.com/Beryl-Engine/Beryl)
 
 Free & Open Source Game Engine built for lovers of modern C#.
 
 > [!WARNING]
-> Orama is a Pre-Release engine. It's API will have **breaking changes**.
+> Beryl is a Pre-Release engine. It's API will have **breaking changes**.
 
 ## About
-Orama is a cross-platform, MIT licensed, 3D-Focused game engine built around modern C#. It's designed to give fans of C# an engine that they'll enjoy using, no messy abstractions, no interop artifacts, and no licensing concerns.
+Beryl is a cross-platform, MIT licensed, 3D-Focused game engine built around modern C#. It's designed to give fans of C# an engine that they'll enjoy using, no messy abstractions, no interop artifacts, and no licensing concerns.
 
 ## Getting Started
-Once you have a `.csproj` that depends on all Orama libraries your game will use, you can start the engine through an entry-point that look a bit like this:
+Once you have a `.csproj` that depends on all Beryl libraries your game will use, you can start the engine through an entry-point that look a bit like this:
 ```csharp
 static void Main(string[] args)
 {
@@ -64,10 +64,10 @@ Rendering is built on a Veldrid-based descriptor defined Vulkan-first engine wit
 
 ### Slang Shaders
 ```slang
-import Orama.Core;
-import Orama.Attributes;
+import Beryl.Core;
+import Beryl.Attributes;
 
-#include "Orama/Preprocessor.slang"
+#include "Beryl/Preprocessor.slang"
 
 SHADER_ATTRIBUTES(
     [ShaderPass("Opaque")]
@@ -100,4 +100,4 @@ float4 Fragment(VertexOutput i) : SV_Target
 ```
 
 ### Modern C#
-Orama has been written to be C# 14-first. Extensive use of properties, nullability, attributes, and abstraction means code can be more explicit and less based in guess work.
+Beryl has been written to be C# 14-first. Extensive use of properties, nullability, attributes, and abstraction means code can be more explicit and less based in guess work.
