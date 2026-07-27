@@ -15,6 +15,8 @@ public class BoxCollider : Collider
 
 	public BoxCollider(Vector3 size) => (Width, Height, Depth) = (size.X, size.Y, size.Z);
 
+	public BoxCollider() : this(1f, 1f, 1f) {}
+
 	public override void Start()
 	{
 		var rb = Entity.GetComponent<RigidBody>();

@@ -9,6 +9,8 @@ public class SphereCollider : Collider
 
 	public SphereCollider(float radius) => Radius = radius;
 
+	public SphereCollider() : this(1f) {}
+
 	public override void Start()
 	{
 		var rb = Entity.GetComponent<RigidBody>();
