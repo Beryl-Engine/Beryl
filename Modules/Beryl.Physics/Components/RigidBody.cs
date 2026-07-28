@@ -148,18 +148,4 @@ public class RigidBody : Component
 
 	/// <inheritdoc/>
 	public void AddForce(Vector3 force) => body?.AddForce(force);
-
-	/// <inheritdoc/>
-	public event Action<IPhysicsBody>? OnCollisionEnter
-	{
-		add { if (body != null) body.OnCollisionEnter += value; }
-		remove { if (body != null) body.OnCollisionEnter -= value; }
-	}
-
-	/// <inheritdoc/>
-	public event Action<IPhysicsBody>? OnCollisionExit
-	{
-		add { if (body != null) body.OnCollisionExit += value; }
-		remove { if (body != null) body.OnCollisionExit -= value; }
-	}
 }
