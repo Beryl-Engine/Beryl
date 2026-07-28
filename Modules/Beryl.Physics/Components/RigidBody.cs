@@ -3,8 +3,11 @@
 
 using Beryl.Common;
 using Beryl.Math;
+using Beryl.Physics.Components.Colliders;
 using Beryl.Scenes.Components;
 using Beryl.Scenes.Entities;
+using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 
 namespace Beryl.Physics.Components;
 
@@ -13,139 +16,104 @@ namespace Beryl.Physics.Components;
 /// </summary>
 public class RigidBody : Component
 {
-	private IPhysicsBody? body;
+	internal IPhysicsBody InternalBody { get; private set; } = null!;
+
+	/// <summary> All <see cref="ICollider"/>s that define the shape of this <see cref="RigidBody"/>. </summary>
+	public ObservableCollection<ICollider> Colliders { get; } = new();
 
 	/// <inheritdoc/>
-	public bool IsStatic
-	{
-		get => body?.IsStatic ?? false;
-		set => body?.IsStatic = value;
-	}
+	public bool IsStatic { get => InternalBody?.IsStatic ?? false; set => InternalBody?.IsStatic = value; }
 
 	/// <inheritdoc/>
-	public bool AffectedByGravity
-	{
-		get => body?.AffectedByGravity ?? false;
-		set => body?.AffectedByGravity = value;
-	}
+	public bool AffectedByGravity { get => InternalBody?.AffectedByGravity ?? false; set => InternalBody?.AffectedByGravity = value; }
 
 	/// <inheritdoc/>
-	public float Mass
-	{
-		get => body?.Mass ?? 0f;
-		set => body?.Mass = value;
-	}
+	public float Mass { get => InternalBody?.Mass ?? 0f; set => InternalBody?.Mass = value; }
 
 	/// <inheritdoc/>
-	public float Friction
-	{
-		get => body?.Friction ?? 0f;
-		set => body?.Friction = value;
-	}
+	public float Friction { get => InternalBody?.Friction ?? 0f; set => InternalBody?.Friction = value; }
 
 	/// <inheritdoc/>
-	public float Restitution
-	{
-		get => body?.Restitution ?? 0f;
-		set => body?.Restitution = value;
-	}
+	public float Restitution { get => InternalBody?.Restitution ?? 0f; set => InternalBody?.Restitution = value; }
 
 	/// <inheritdoc/>
-	public Vector3 Position
-	{
-		get => body?.Position ?? Vector3.Zero;
-		set => body?.Position = value;
-	}
+	public Vector3 Position { get => InternalBody?.Position ?? Vector3.Zero; set => InternalBody?.Position = value; }
 
 	/// <inheritdoc/>
-	public Quaternion Orientation
-	{
-		get => body?.Orientation ?? new Quaternion(0, 0, 0, 1);
-		set => body?.Orientation = value;
-	}
+	public Quaternion Orientation { get => InternalBody?.Orientation ?? new Quaternion(0, 0, 0, 1); set => InternalBody?.Orientation = value; }
 
 	/// <inheritdoc/>
-	public Vector3 Velocity
-	{
-		get => body?.Velocity ?? Vector3.Zero;
-		set => body?.Velocity = value;
-	}
+	public Vector3 Velocity { get => InternalBody?.Velocity ?? Vector3.Zero; set => InternalBody?.Velocity = value; }
 
 	/// <inheritdoc/>
-	public Vector3 AngularVelocity
-	{
-		get => body?.AngularVelocity ?? Vector3.Zero;
-		set => body?.AngularVelocity = value;
-	}
+	public Vector3 AngularVelocity { get => InternalBody?.AngularVelocity ?? Vector3.Zero; set => InternalBody?.AngularVelocity = value; }
 
 	/// <inheritdoc/>
-	public Vector2 Damping
-	{
-		get => body?.Damping ?? Vector2.Zero;
-		set => body?.Damping = value;
-	}
+	public Vector2 Damping { get => InternalBody?.Damping ?? Vector2.Zero; set => InternalBody?.Damping = value; }
 
 	/// <inheritdoc/>
 	public override void Start()
 	{
-		var physics = ModuleManager.GetModule<PhysicsModule>();
-		body = physics?.World?.CreateBody(Entity);
+		base.Start();
 
-		if (body != null)
-			body.Position = Entity.Transform.Position;
+		Colliders.CollectionChanged += OnCollidersModified;
+
+		var physics = ModuleManager.GetModule<PhysicsModule>();
+		if (physics == null)
+			return;
+
+		InternalBody = physics.World.CreateBody(Entity);
+
+		if (InternalBody != null)
+			InternalBody.Position = Entity.Transform.Position;
+
+		foreach (var collider in Colliders)
+			collider.AddTo(this);
 	}
 
 	/// <inheritdoc/>
 	public override void Update()
 	{
-		if (body == null)
+		base.Update();
+
+		if (InternalBody == null)
 			return;
 
-		Entity.Transform.Position = body.Position;
-		Entity.Transform.Rotation = body.Orientation;
+		Entity.Transform.Position = InternalBody.Position;
+		Entity.Transform.Rotation = InternalBody.Orientation;
 	}
 
 	/// <inheritdoc/>
 	public override void Destroy()
 	{
 		base.Destroy();
+
+		Colliders.CollectionChanged -= OnCollidersModified;
+
+		foreach (var collider in Colliders)
+			collider.RemoveFrom(this);
+
 		var physics = ModuleManager.GetModule<PhysicsModule>();
 
-		if (body != null)
-			physics?.World?.DestroyBody(body);
+		if (InternalBody != null)
+			physics?.World?.DestroyBody(InternalBody);
 	}
 
 	/// <inheritdoc/>
-	public int AddBoxCollider(float width, float height, float depth)
+	public void AddForce(Vector3 force) => InternalBody?.AddForce(force);
+
+	private void OnCollidersModified(object? sender, NotifyCollectionChangedEventArgs e)
 	{
-		if (body == null)
-			return 0;
+		if (e.Action == NotifyCollectionChangedAction.Add)
+		{
+			foreach (ICollider collider in e.NewItems!)
+				collider.AddTo(this);
+		}
 
-		int id = body.AddBoxCollider(width, height, depth);
-
-		if (IsStatic)
-			Orientation = Entity.Transform.Rotation;
-
-		return id;
+		if (e.Action == NotifyCollectionChangedAction.Remove)
+		{
+			foreach (ICollider collider in e.OldItems!)
+				collider.RemoveFrom(this);
+		}
 	}
-
-	/// <inheritdoc/>
-	public int AddSphereCollider(float radius)
-	{
-		if (body == null)
-			return 0;
-
-		int id = body.AddSphereCollider(radius);
-
-		if (IsStatic)
-			Orientation = Entity.Transform.Rotation;
-
-		return id;
-	}
-
-	/// <inheritdoc/>
-	public void RemoveCollider(int id) => body?.RemoveCollider(id);
-
-	/// <inheritdoc/>
-	public void AddForce(Vector3 force) => body?.AddForce(force);
 }

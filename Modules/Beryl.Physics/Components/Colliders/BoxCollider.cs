@@ -5,8 +5,11 @@ using Beryl.Math;
 
 namespace Beryl.Physics.Components.Colliders;
 
-public class BoxCollider : Collider
+public struct BoxCollider : ICollider
 {
+	/// <inheritdoc/>
+	public int ShapeID { get; private set; }
+
 	public float Width { get; set; }
 	public float Height { get; set; }
 	public float Depth { get; set; }
@@ -17,10 +20,6 @@ public class BoxCollider : Collider
 
 	public BoxCollider() : this(1f, 1f, 1f) {}
 
-	public override void Start()
-	{
-		var rb = Entity.GetComponent<RigidBody>();
-		if (rb != null)
-			shapeId = rb.AddBoxCollider(Width, Height, Depth);
-	}
+	/// <inheritdoc/>
+	public void AddTo(RigidBody rb) => ShapeID = rb.InternalBody.AddBoxCollider(Width, Height, Depth);
 }

@@ -23,15 +23,13 @@ public class DebugEntity : Entity
 	[ImplicitComponent]
 	public RigidBody RigidBody { get; } = null!;
 
-	[ImplicitComponent]
-	public BoxCollider Collider { get; } = null!;
-
 	/// <inheritdoc/>
 	public override void Start()
 	{
 		base.Start();
 
 		RigidBody.IsStatic = true;
+		RigidBody.Colliders.Add(new BoxCollider(1f, 1f, 1f));
 
 		var mesh = Application.ResourceProvider.GetResource<Mesh>("Assets/PrimitiveCube.fbx");
 

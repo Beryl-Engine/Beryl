@@ -6,6 +6,7 @@ using Beryl.Common.Utility;
 using Beryl.Input;
 using Beryl.Input.Devices;
 using Beryl.Math;
+using Beryl.Physics;
 using Beryl.Rendering.Components;
 using Beryl.Scenes.Entities;
 
@@ -38,8 +39,11 @@ public class FlyController : Entity
 			Input.PrimaryMouse?.CursorLocked = cursorLocked;
 		}
 
-		if (Input.PrimaryGamepad?.IsButtonPressed(Gamepad.Button.ActionLeft) ?? false)
-			BerylConsole.Log("Action left pressed.");
+		if (Input.PrimaryKeyboard?.IsKeyPressed(Keyboard.Key.E) ?? false)
+		{
+			if (ModuleManager.GetModule<PhysicsModule>()?.World.TryRaycast(Transform.Position, Transform.Forward, 100f, out var hit) ?? false)
+				BerylConsole.Log(hit.Body.Owner?.Name);
+		}
 
 		// Movement
 		if (Input.PrimaryKeyboard?.IsKeyDown(Keyboard.Key.W) ?? false)

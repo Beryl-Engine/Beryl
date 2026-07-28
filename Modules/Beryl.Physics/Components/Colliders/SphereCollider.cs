@@ -3,18 +3,17 @@
 
 namespace Beryl.Physics.Components.Colliders;
 
-public class SphereCollider : Collider
+public struct SphereCollider : ICollider
 {
+	/// <inheritdoc/>
+	public int ShapeID { get; private set; }
+
 	public float Radius { get; set; }
 
 	public SphereCollider(float radius) => Radius = radius;
 
 	public SphereCollider() : this(1f) {}
 
-	public override void Start()
-	{
-		var rb = Entity.GetComponent<RigidBody>();
-		if (rb != null)
-			shapeId = rb.AddSphereCollider(Radius);
-	}
+	/// <inheritdoc/>
+	public void AddTo(RigidBody rb) => ShapeID = rb.InternalBody.AddSphereCollider(Radius);
 }
