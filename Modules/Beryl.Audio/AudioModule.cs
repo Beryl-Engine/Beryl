@@ -3,7 +3,6 @@
 
 using Beryl.Audio.Engines.OpenAL;
 using Beryl.Common;
-using Beryl.Scenes;
 
 namespace Beryl.Audio;
 
@@ -13,8 +12,6 @@ namespace Beryl.Audio;
 public class AudioModule : BaseModule, IAudioContext
 {
 	private readonly IAudioContext context;
-
-	private readonly AudioPhysics audioPhysics = new();
 
 	/// <inheritdoc/>
 	public IAudioSource CreateSource() => context.CreateSource();
@@ -52,12 +49,7 @@ public class AudioModule : BaseModule, IAudioContext
 		Application.OnUpdate -= Update;
 	}
 
-	public void Update()
-	{
-		var activeScene = ModuleManager.GetModule<SceneModule>()?.CurrentScene;
-		if (activeScene != null)
-			audioPhysics.Update(activeScene);
-	}
+	public void Update() { }
 }
 
 /// <summary> Defines how audio source volume attenuates with distance from the listener. </summary>

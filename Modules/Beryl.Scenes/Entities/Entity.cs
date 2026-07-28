@@ -36,7 +36,7 @@ public class Entity
 	public Transform Transform { get; set; } = new();
 
 	/// <summary> The components attached to the entity. </summary>
-	public IReadOnlyList<Component> Components => components;
+	protected IReadOnlyList<Component> Components => components;
 
 	[AlwaysSerialize]
 	private readonly List<Component> components = new();
@@ -122,7 +122,6 @@ public class Entity
 	public void Destroy()
 	{
 		Enabled = false;
-		;
 
 		foreach (var component in CollectionsMarshal.AsSpan(components))
 		{
@@ -139,7 +138,7 @@ public class Entity
 
 	#region Component Methods
 	/// <summary> Adds a component to the entity. </summary>
-	public Component AddComponent(Component component)
+	protected Component AddComponent(Component component)
 	{
 		component.Entity = this;
 		components.Add(component);
@@ -148,15 +147,15 @@ public class Entity
 	}
 
 	/// <summary> Gets a component of type T from the entity. </summary>
-	public T? GetComponent<T>() where T : Component => (T?)components.Find(c => c is T);
+	protected T? GetComponent<T>() where T : Component => (T?)components.Find(c => c is T);
 
 	/// <summary> Adds a new component of type T to the entity. </summary>
-	public T AddComponent<T>() where T : Component, new() => (T)AddComponent(new T());
+	protected T AddComponent<T>() where T : Component, new() => (T)AddComponent(new T());
 
 	/// <summary> Gets a component of type T from the entity or adds a new one if it doesn't exist. </summary>
-	public T GetOrAddComponent<T>() where T : Component, new() => GetComponent<T>() ?? AddComponent<T>();
+	protected T GetOrAddComponent<T>() where T : Component, new() => GetComponent<T>() ?? AddComponent<T>();
 
 	/// <summary> Removes a component from the entity. </summary>
-	public void RemoveComponent(Component component) => components.Remove(component);
+	protected void RemoveComponent(Component component) => components.Remove(component);
 	#endregion
 }

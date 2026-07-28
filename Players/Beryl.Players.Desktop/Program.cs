@@ -9,11 +9,9 @@ using Beryl.Input;
 using Beryl.Math;
 using Beryl.Physics;
 using Beryl.Rendering;
-using Beryl.Rendering.Components;
 using Beryl.Rendering.Entities;
 using Beryl.Rendering.Resources;
 using Beryl.Scenes;
-using Beryl.Scenes.Entities;
 using Beryl.VirtualReality;
 
 namespace Beryl.Desktop;
@@ -46,10 +44,9 @@ internal sealed class Program
 			Shader? shader = Application.ResourceProvider.GetResource<Shader>("Assets/Beryl/Unlit.slang");
 			cubeMesh?.Material = new(shader ?? throw new Exception("Shader not found"));
 
-			Entity cube = new();
-			cube.Transform.Position = new Vector3(0, 2, 0);
-			MeshRenderer renderer = cube.AddComponent<MeshRenderer>();
-			renderer.Mesh = cubeMesh;
+			StaticProp prop = new();
+			prop.Transform.Position = new Vector3(0, 2, 0);
+			prop.Mesh = cubeMesh;
 
 			ModuleManager.GetModule<SceneModule>()?.CurrentScene.StartAll();
 		};
