@@ -16,9 +16,6 @@ public interface IGraphicsDevice : IDisposable
 	VulkanInfo? VulkanInfo { get; }
 	#endregion
 
-	/// <summary> The current frame. </summary>
-	ulong CurrentFrame { get; set; }
-
 	/// <summary> Unique features of this <see cref="IGraphicsDevice"/> implementation. </summary>
 	DeviceFeatures Features { get; }
 

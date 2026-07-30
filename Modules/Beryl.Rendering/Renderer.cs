@@ -20,6 +20,9 @@ public static class Renderer
 	/// <summary> The lower-level <see cref="IGraphicsDevice"/>. </summary>
 	public static IGraphicsDevice Device { get; private set; } = null!;
 
+	/// <summary> Incremented every rendered frame. </summary>
+	public static ulong CurrentFrame { get; private set; }
+
 	/// <summary> Initializes the desired backend. Should be called once after window loading. </summary>
 	/// <param name="window"> The window to initialize the backend for. </param>
 	/// <param name="backend"> The backend to initialize. </param>
@@ -46,9 +49,9 @@ public static class Renderer
 	public static void Present()
 	{
 		Device.SwapBuffers();
-		Device.CurrentFrame++;
+		CurrentFrame++;
 
-		FrameDisposalQueue.DisposeResources(Device.CurrentFrame);
+		FrameDisposalQueue.DisposeResources(CurrentFrame);
 	}
 
 	/// <summary> Submits the given <see cref="ICommandBuffer"/> to be ran. </summary>

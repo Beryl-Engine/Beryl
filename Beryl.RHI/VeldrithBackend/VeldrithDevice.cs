@@ -36,9 +36,6 @@ internal sealed class VeldrithDevice : IGraphicsDevice
 	}
 
 	/// <inheritdoc/>
-	public ulong CurrentFrame { get; set; }
-
-	/// <inheritdoc/>
 	public DeviceFeatures Features
 	{
 		get
