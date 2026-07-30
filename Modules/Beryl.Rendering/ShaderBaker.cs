@@ -10,6 +10,40 @@ namespace Beryl.Rendering;
 /// </summary>
 public static class ShaderBaker
 {
+	/// <summary> The <see cref="SlangCompileTarget"/> for the current rendering backend. </summary>
+	public static SlangCompileTarget SlangTarget
+	{
+		get
+		{
+			switch (Renderer.Backend)
+			{
+				case RHI.RendererBackend.Vulkan:
+					return SlangCompileTarget.Spirv;
+				case RHI.RendererBackend.Direct3D12:
+					return SlangCompileTarget.Dxil;
+				default:
+					throw new NotImplementedException($"Can't compile Slang for target {Renderer.Backend}.");
+			}
+		}
+	}
+
+	/// <summary> The <see cref="SlangProfileID"/> for the current rendering backend. </summary>
+	public static SlangProfileID SlangProfile
+	{
+		get
+		{
+			switch (Renderer.Backend)
+			{
+				case RHI.RendererBackend.Vulkan:
+					return globalSession.FindProfile("spirv_1_3");
+				case RHI.RendererBackend.Direct3D12:
+					return globalSession.FindProfile("sm_6_0");
+				default:
+					throw new NotImplementedException($"Can't compile Slang for target {Renderer.Backend}.");
+			}
+		}
+	}
+
 	private static readonly IGlobalSession globalSession;
 	private static readonly ISession localSession;
 
@@ -34,7 +68,7 @@ public static class ShaderBaker
 
 		SessionDesc sesDesc = new()
 		{
-			Targets = [new TargetDesc { Format = SlangCompileTarget.Spirv, Profile = globalSession.FindProfile("spirv_1_3") }],
+			Targets = [new TargetDesc { Format = SlangTarget, Profile = SlangProfile }],
 			SearchPaths = ["Assets"], // Hacky
 			CompilerOptionEntries = options,
 		};
