@@ -1,6 +1,6 @@
 # Beryl Engine
 <p align="left">
-  <img src="http://github.com/Beryl-Engine/Branding/blob/main/logo/banner/banner-full-colored.svg?raw=true" alt="Beryl Banner" width="400">
+  <img src="https://raw.githubusercontent.com/Beryl-Engine/Branding/refs/heads/main/logo/banner/banner-full-colored.svg" alt="Beryl Banner" width="400">
 </p>
 
 ![PreRelease](https://img.shields.io/badge/Version-Pre--Release-orange?logo=git&logoColor=f5f5f5) ![MIT](https://img.shields.io/badge/License-MIT-green?logo=opensourcehardware&logoColor=f5f5f5) [![Commit Activity](https://img.shields.io/github/commit-activity/w/Beryl-Engine/Beryl?label=Commit%20Activity&logo=github)](https://github.com/Beryl-Engine/Beryl)
