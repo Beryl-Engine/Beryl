@@ -24,8 +24,6 @@ static void Main(string[] args)
     ModuleManager.RegisterModule<PhysicsModule>();
     ModuleManager.RegisterModule<SceneModule>();
     ModuleManager.RegisterModule<AudioModule>();
-    ModuleManager.RegisterModule<GUIModule>();
-    ModuleManager.RegisterModule<VirtualRealityModule>();
     ModuleManager.RegisterModule<RenderingModule>();
 
     Application.OnStart += () =>
