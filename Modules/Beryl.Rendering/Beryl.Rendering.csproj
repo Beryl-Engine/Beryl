@@ -30,13 +30,13 @@
     <None Update="Assets\Beryl\Debug.slang">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="Assets\Beryl\DummyLit.slang">
+    <None Update="Assets\Defaults\DummyLit.slang">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="Assets\Beryl\Sky.slang">
+    <None Update="Assets\Defaults\Sky.slang">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="Assets\Beryl\Unlit.slang">
+    <None Update="Assets\Defaults\Unlit.slang">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="Assets\Beryl\Preprocessor.slang">

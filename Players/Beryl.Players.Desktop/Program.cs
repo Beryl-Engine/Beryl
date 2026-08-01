@@ -33,7 +33,7 @@ internal sealed class Program
 		Application.OnStart += () =>
 		{
 			Mesh? skyMesh = Application.ResourceProvider.GetResource<Mesh>("Assets/PrimitiveCube.fbx");
-			Shader? sky = Application.ResourceProvider.GetResource<Shader>("Assets/Beryl/Sky.slang");
+			Shader? sky = Application.ResourceProvider.GetResource<Shader>("Assets/Defaults/Sky.slang");
 			skyMesh?.Material = new(sky ?? throw new Exception("Shader not found"));
 
 			StaticProp skyProp = new();
@@ -49,7 +49,7 @@ internal sealed class Program
 			floor.Transform.Scale = new Vector3(10, 1, 10);
 
 			Mesh? cubeMesh = Application.ResourceProvider.GetResource<Mesh>("Assets/PrimitiveCube.fbx");
-			Shader? shader = Application.ResourceProvider.GetResource<Shader>("Assets/Beryl/DummyLit.slang");
+			Shader? shader = Application.ResourceProvider.GetResource<Shader>("Assets/Defaults/DummyLit.slang");
 			cubeMesh?.Material = new(shader ?? throw new Exception("Shader not found"));
 
 			StaticProp prop = new();

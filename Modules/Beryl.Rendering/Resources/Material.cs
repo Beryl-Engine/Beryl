@@ -27,7 +27,7 @@ public class Material
 
 	static Material()
 	{
-		Shader? def = Application.ResourceProvider.GetResource<Shader>("Assets/Beryl/DummyLit.slang");
+		Shader? def = Application.ResourceProvider.GetResource<Shader>("Assets/Defaults/DummyLit.slang");
 		if (def == null)
 		{
 			Default = new Material(new Shader(""));
