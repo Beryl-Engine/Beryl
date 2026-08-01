@@ -15,16 +15,18 @@ namespace Beryl.Rendering.Entities;
 [Entity("fly_controller")]
 public class FlyController : Entity
 {
-	[ImplicitComponentAttribute] public Camera Camera { get; set; } = null!;
+	public float Sensitivity { get; set; } = 0.0025f;
+	public float Speed { get; set; } = 8f;
 
-	private readonly float mouseSensitivity = 0.0025f;
-	private readonly float moveSpeed = 8.0f;
+	[ImplicitComponent] 
+	protected Camera Camera { get; set; } = null!;
 
 	private float pitch;
 	private float yaw;
 
-	bool cursorLocked = false;
+	private bool cursorLocked = false;
 
+	/// <inheritdoc/>
 	public override void Update()
 	{
 		base.Update();
@@ -47,13 +49,13 @@ public class FlyController : Entity
 
 		// Movement
 		if (Input.PrimaryKeyboard?.IsKeyDown(Keyboard.Key.W) ?? false)
-			Transform.Position += Transform.Forward * moveSpeed * Time.Delta;
+			Transform.Position += Transform.Forward * Speed * Time.Delta;
 		if (Input.PrimaryKeyboard?.IsKeyDown(Keyboard.Key.S) ?? false)
-			Transform.Position -= Transform.Forward * moveSpeed * Time.Delta;
+			Transform.Position -= Transform.Forward * Speed * Time.Delta;
 		if (Input.PrimaryKeyboard?.IsKeyDown(Keyboard.Key.A) ?? false)
-			Transform.Position -= Transform.Right * moveSpeed * Time.Delta;
+			Transform.Position -= Transform.Right * Speed * Time.Delta;
 		if (Input.PrimaryKeyboard?.IsKeyDown(Keyboard.Key.D) ?? false)
-			Transform.Position += Transform.Right * moveSpeed * Time.Delta;
+			Transform.Position += Transform.Right * Speed * Time.Delta;
 
 		if (!cursorLocked)
 			return;
@@ -61,8 +63,8 @@ public class FlyController : Entity
 		// Mouse look
 		Vector2 delta = Input.PrimaryMouse?.MouseDelta ?? Vector2.Zero;
 
-		yaw += delta.X * mouseSensitivity;
-		pitch += delta.Y * mouseSensitivity;
+		yaw += delta.X * Sensitivity;
+		pitch += delta.Y * Sensitivity;
 
 		pitch = Math.Math.Clamp(pitch, -1.55f, 1.55f);
 
