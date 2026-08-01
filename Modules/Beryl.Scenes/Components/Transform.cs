@@ -8,7 +8,7 @@ namespace Beryl.Scenes.Components;
 /// <summary>
 /// A 3D Position, Rotation and Scale.
 /// </summary>
-public class Transform : Component
+public class Transform
 {
 	/// <summary> The position of the transform. </summary>
 	public Vector3 Position { get; set; }

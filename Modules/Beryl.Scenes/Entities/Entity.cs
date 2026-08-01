@@ -45,7 +45,6 @@ public class Entity
 	/// <summary> Initializes a new instance of the <see cref="Entity"/> class. </summary>
 	public Entity()
 	{
-		Transform.Entity = this;
 		ModuleManager.GetModule<SceneModule>()?.CurrentScene.Entities.Add(this);
 
 		foreach (var field in GetType().GetFields(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public))
