@@ -7,10 +7,10 @@ module Attributes;
 // Shader Parameters.
 // -----------------------------------------------------------------------------
 
-#define SHADER_PARAMETER [__AttributeUsage(_AttributeTargets.Struct)]
+#define SHADER_ATTRIBUTE [__AttributeUsage(_AttributeTargets.Struct)]
 
 /// @brief Specifies which rendering pass this shader will be used in.
-SHADER_PARAMETER
+SHADER_ATTRIBUTE
 public struct ShaderPassAttribute
 {
     string passName;
@@ -22,8 +22,31 @@ public struct ShaderPassAttribute
 /// - `"None"`: Disable face culling.
 /// - `"Front"`: Cull front-facing polygons.
 /// - `"Back"`: Cull back-facing polygons.
-SHADER_PARAMETER
+SHADER_ATTRIBUTE
 public struct CullModeAttribute
+{
+    string modeName;
+};
+
+/// @brief Specifies how objects using this shader will be written to the depth buffer.
+///
+/// Valid values are:
+/// - `"Off"`: Do not write to the depth buffer.
+/// - `"On"`: Write to the depth buffer.
+SHADER_ATTRIBUTE
+public struct DepthWriteAttribute
+{
+    string modeName;
+};
+
+/// @brief Specifies how objects using this shader will test against the depth buffer.
+/// Valid values are:
+/// - `"Never"`: Never test against the depth buffer.
+/// - `"Always"`: Always test against the depth buffer.
+/// - `"Less"`: Test against the depth buffer and fail if the depth test fails.
+/// - `"Greater"`: Test against the depth buffer and fail if the depth test succeeds.
+SHADER_ATTRIBUTE
+public struct DepthTestAttribute
 {
     string modeName;
 };

@@ -51,7 +51,8 @@ public static class CommandBufferExtensions
 				fragShader: new ShaderDescriptor(material.Shader.FragmentBytecode, ShaderStages.Fragment),
 				output: cmd.CurrentFramebuffer,
 				resourceGroups: material.Shader.ResourceGroups.AsSpan(),
-				cullingMode: material.Shader.CullingMode
+				cullingMode: material.Shader.CullingMode,
+				depthComparison: material.Shader.DepthComparison
 			);
 
 			FrameCountedResource<RenderItem> renderItem = RenderItemCache.Instance.GetOrCreate(new RenderItemKey(vertices, normals, uvs, indices, pipelineKey));

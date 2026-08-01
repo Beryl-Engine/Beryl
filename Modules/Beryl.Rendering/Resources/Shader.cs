@@ -46,6 +46,26 @@ public class Shader
 					else
 						BerylConsole.Warning($"Unsupported culling mode '{attribute.GetArgumentValueString(0)}'.");
 				}
+
+				if (attribute.Name == "DepthWrite")
+				{
+					string mode = attribute.GetArgumentValueString(0);
+
+					if (mode == "On")
+						DepthWrite = true;
+					else if (mode == "Off")
+						DepthWrite = false;
+					else
+						BerylConsole.Warning($"Unsupported depth write mode '{mode}'.");
+				}
+
+				if (attribute.Name == "DepthTest")
+				{
+					if (Enum.TryParse(attribute.GetArgumentValueString(0), true, out ComparisonMode mode))
+						DepthComparison = mode;
+					else
+						BerylConsole.Warning($"Unsupported depth test mode '{attribute.GetArgumentValueString(0)}'.");
+				}
 			}
 
 			var resources = new List<ShaderResource>();
@@ -147,6 +167,12 @@ public class Shader
 
 	/// <summary> The shader's requested <see cref="RHI.CullingMode"/>. </summary>
 	internal CullingMode CullingMode { get; private set; } = CullingMode.Back;
+
+	/// <summary> The shader's requested <see cref="ComparisonMode"/>. </summary>
+	internal ComparisonMode DepthComparison { get; private set; } = ComparisonMode.Less;
+
+	/// <summary> Whether or not the shader wants to write to the depth buffer. </summary>
+	internal bool DepthWrite { get; private set; } = true;
 
 	/// <summary> Initializes a new instance of the <see cref="Shader"/> class. </summary>
 	/// <param name="source">The slang source code.</param>

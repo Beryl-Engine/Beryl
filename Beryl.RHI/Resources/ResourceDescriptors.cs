@@ -35,7 +35,8 @@ public readonly ref struct BufferDescriptor(uint size, BufferUsage usage) : IAlw
 
 
 
-public readonly ref struct PipelineDescriptor(string passName, ShaderDescriptor vertShader, ShaderDescriptor fragShader, IFramebuffer output, ReadOnlySpan<ShaderResourceGroup> resourceGroups, CullingMode cullingMode = CullingMode.Back) : IAlwaysHashable
+// We need to split this up into smaller structs (i.e., DepthInfo)
+public readonly ref struct PipelineDescriptor(string passName, ShaderDescriptor vertShader, ShaderDescriptor fragShader, IFramebuffer output, ReadOnlySpan<ShaderResourceGroup> resourceGroups, CullingMode cullingMode = CullingMode.Back, bool writeDepth = true, ComparisonMode depthComparison = ComparisonMode.Less) : IAlwaysHashable
 {
 	public readonly string PassName = passName;
 	public readonly ShaderDescriptor VertShader = vertShader;
@@ -43,6 +44,8 @@ public readonly ref struct PipelineDescriptor(string passName, ShaderDescriptor 
 	public readonly IFramebuffer Output = output;
 	public readonly ReadOnlySpan<ShaderResourceGroup> ResourceGroups = resourceGroups;
 	public readonly CullingMode CullingMode = cullingMode;
+	public readonly bool WriteDepth = writeDepth;
+	public readonly ComparisonMode DepthComparison = depthComparison;
 
 	/// <inheritdoc/>
 	public override int GetHashCode()
@@ -53,6 +56,8 @@ public readonly ref struct PipelineDescriptor(string passName, ShaderDescriptor 
 		hash.Add(FragShader.GetHashCode());
 		hash.Add(Output);
 		hash.Add(CullingMode);
+		hash.Add(WriteDepth);
+		hash.Add(DepthComparison);
 		foreach (ref readonly var group in ResourceGroups)
 		{
 			hash.Add(group.Set);

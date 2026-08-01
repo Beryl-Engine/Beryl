@@ -113,7 +113,7 @@ internal sealed class VeldrithResourceFactory(VeldrithDevice device) : IResource
 		var description = new GraphicsPipelineDescription
 		{
 			BlendState = BlendStateDescription.SINGLE_OVERRIDE_BLEND,
-			DepthStencilState = new DepthStencilStateDescription(true, true, ComparisonKind.LessEqual),
+			DepthStencilState = new DepthStencilStateDescription(true, key.WriteDepth, ToVeldrith(key.DepthComparison)),
 			RasterizerState = ToVeldrith(key.CullingMode),
 			PrimitiveTopology = PrimitiveTopology.TriangleList,
 			ShaderSet = shaderSet,
@@ -157,6 +157,19 @@ internal sealed class VeldrithResourceFactory(VeldrithDevice device) : IResource
 		CullingMode.Back => new RasterizerStateDescription(FaceCullMode.Back, PolygonFillMode.Solid, FrontFace.CounterClockwise, true, true),
 		CullingMode.Front => new RasterizerStateDescription(FaceCullMode.Front, PolygonFillMode.Solid, FrontFace.CounterClockwise, true, true),
 		_ => RasterizerStateDescription.CULL_NONE
+	};
+
+	private static ComparisonKind ToVeldrith(ComparisonMode comparison) => comparison switch
+	{
+		ComparisonMode.Always => ComparisonKind.Always,
+		ComparisonMode.Less => ComparisonKind.Less,
+		ComparisonMode.LessOrEqual => ComparisonKind.LessEqual,
+		ComparisonMode.Equal => ComparisonKind.Equal,
+		ComparisonMode.NotEqual => ComparisonKind.NotEqual,
+		ComparisonMode.GreaterOrEqual => ComparisonKind.GreaterEqual,
+		ComparisonMode.Greater => ComparisonKind.Greater,
+		ComparisonMode.Never => ComparisonKind.Never,
+		_ => ComparisonKind.Never
 	};
 
 	private static Veldrith.IBindableResource ToVeldrith(Resources.IBindableResource resource) => resource switch
