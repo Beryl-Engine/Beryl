@@ -3,6 +3,7 @@
 
 using Beryl.Common.Resources.DefaultProvider;
 using Beryl.Common.Utility;
+using Beryl.RHI;
 using Beryl.RHI.Resources;
 using SlangShaderSharp;
 using System.Collections.Immutable;
@@ -12,6 +13,10 @@ namespace Beryl.Rendering.Resources;
 
 public class Shader
 {
+	/// <summary> The <see cref="IShaderDefaultsProvider"/> used by shaders. </summary>
+	/// <remarks> Defaults to <see cref="Rendering.ShaderDefaultsProvider"/>. </remarks>
+	public static IShaderDefaultsProvider DefaultsProvider { get; } = new ShaderDefaultsProvider();
+
 	/// <summary> The name of the shader's pass. </summary>
 	public string Pass { get; internal set; } = "None";
 
@@ -33,6 +38,14 @@ public class Shader
 			{
 				if (attribute.Name == "ShaderPass")
 					Pass = attribute.GetArgumentValueString(0);
+
+				if (attribute.Name == "CullMode")
+				{
+					if (Enum.TryParse(attribute.GetArgumentValueString(0), true, out CullingMode mode))
+						CullingMode = mode;
+					else
+						BerylConsole.Warning($"Unsupported culling mode '{attribute.GetArgumentValueString(0)}'.");
+				}
 			}
 
 			var resources = new List<ShaderResource>();
@@ -120,10 +133,6 @@ public class Shader
 		}
 	}
 
-	/// <summary> The <see cref="IShaderDefaultsProvider"/> used by shaders. </summary>
-	/// <remarks> Defaults to <see cref="Rendering.ShaderDefaultsProvider"/>. </remarks>
-	public static IShaderDefaultsProvider DefaultsProvider { get; } = new ShaderDefaultsProvider();
-
 	/// <summary> The shader's resource definitions. </summary>
 	public ImmutableArray<ShaderResource> Resources { get; private set; } = ImmutableArray<ShaderResource>.Empty;
 
@@ -135,6 +144,9 @@ public class Shader
 
 	/// <summary> The shader's raw SPIR-V bytecode. </summary>
 	internal byte[] FragmentBytecode { get; private set; } = Array.Empty<byte>();
+
+	/// <summary> The shader's requested <see cref="RHI.CullingMode"/>. </summary>
+	internal CullingMode CullingMode { get; private set; } = CullingMode.Back;
 
 	/// <summary> Initializes a new instance of the <see cref="Shader"/> class. </summary>
 	/// <param name="source">The slang source code.</param>

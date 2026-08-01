@@ -3,11 +3,25 @@
 
 module Attributes;
 
+// -----------------------------------------------------------------------------
+// Shader Parameters.
+// -----------------------------------------------------------------------------
+
+#define SHADER_PARAMETER [__AttributeUsage(_AttributeTargets.Struct)]
+
 // Defines which rendering pass this shader will be used in.
-[__AttributeUsage(_AttributeTargets.Struct)]
+SHADER_PARAMETER
 public struct ShaderPassAttribute
 {
     string passName;
+};
+
+// Defines how objects using this shader will cull.
+// Options: "None", "Front", "Back"
+SHADER_PARAMETER
+public struct CullModeAttribute
+{
+    string modeName;
 };
 
 // -----------------------------------------------------------------------------
