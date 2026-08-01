@@ -46,6 +46,8 @@ static void Main(string[] args)
 }
 ```
 
+Looking to dive a bit deeper? Check out the [Beryl Documentation](https://berylengine.org/docs/introduction/introduction.html).
+
 ## Features
 ### Modern C#
 Beryl fully embraces modern C# and it's features. Extensive use of properties, nullability, attributes, and abstraction means code can be more explicit and less based in guess work.
