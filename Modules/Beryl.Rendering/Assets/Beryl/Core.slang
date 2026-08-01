@@ -13,7 +13,7 @@ public struct CameraData
     public float4x4 ProjectionMatrix;
 };
 
-// Information about the rendering camera.
+/// @brief Information about the rendering Camera.
 public ParameterBlock<CameraData> Camera;
 
 public struct ObjectData
@@ -21,7 +21,7 @@ public struct ObjectData
     public float4x4 ModelMatrix;
 };
 
-// Information about this object.
+/// @brief Information about the object being rendered.
 public ParameterBlock<ObjectData> Object;
 
 // -----------------------------------------------------------------------------
@@ -44,7 +44,7 @@ public struct VertexOutput
     public float3 WorldPosition;
 };
 
-// Wrapper for Two-Dimensional Textures and Samplers.
+/// @brief Wrapper for two-dimensional Textures and Samplers.
 public struct SampledTexture2D<T> where T : ITexelElement
 {
     public Texture2D<T> Texture;

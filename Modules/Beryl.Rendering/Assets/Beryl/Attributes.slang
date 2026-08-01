@@ -9,15 +9,19 @@ module Attributes;
 
 #define SHADER_PARAMETER [__AttributeUsage(_AttributeTargets.Struct)]
 
-// Defines which rendering pass this shader will be used in.
+/// @brief Specifies which rendering pass this shader will be used in.
 SHADER_PARAMETER
 public struct ShaderPassAttribute
 {
     string passName;
 };
 
-// Defines how objects using this shader will cull.
-// Options: "None", "Front", "Back"
+/// @brief Specifies how objects using this shader will be culled.
+///
+/// Valid values are:
+/// - `"None"`: Disable face culling.
+/// - `"Front"`: Cull front-facing polygons.
+/// - `"Back"`: Cull back-facing polygons.
 SHADER_PARAMETER
 public struct CullModeAttribute
 {
