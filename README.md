@@ -46,7 +46,7 @@ static void Main(string[] args)
 }
 ```
 
-Looking to dive a bit deeper? Check out the [Beryl Documentation](https://berylengine.org/docs/introduction/introduction.html).
+**Want to learn more?** Check out the [Beryl documentation](https://berylengine.org/docs/introduction/introduction.html).
 
 ## Features
 ### Modern C#
