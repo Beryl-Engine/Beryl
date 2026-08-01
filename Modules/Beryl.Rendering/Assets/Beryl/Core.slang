@@ -9,6 +9,7 @@ module Core;
 
 public struct CameraData
 {
+    public float3 WorldPosition;
     public float4x4 ViewMatrix;
     public float4x4 ProjectionMatrix;
 };

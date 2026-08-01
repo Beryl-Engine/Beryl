@@ -31,6 +31,7 @@ public class ShaderDefaultsProvider : IShaderDefaultsProvider
 	public ReadOnlySpan<byte> GetCameraBuffer(Camera camera)
 	{
 		using var cameraBuffer = GPUBufferPool.Shared.RentAuto();
+		cameraBuffer.Object.AddFloat3(camera.Entity.Transform.Position.X, camera.Entity.Transform.Position.Y, camera.Entity.Transform.Position.Z);
 		cameraBuffer.Object.AddMatrix4x4(camera.ViewMatrix);
 		cameraBuffer.Object.AddMatrix4x4(camera.ProjectionMatrix * ClipCorrectionMatrix);
 

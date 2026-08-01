@@ -14,11 +14,20 @@ SHADER_PARAMETERS(
     [DefaultFloat3(1, 1, 1)]
     float3 Color;
 
-    [DefaultFloat(10)]
+    [DefaultFloat(0.6)]
     float Intensity;
 
-    [DefaultFloat3(0, 5, 3)]
-    float3 Position;
+    [DefaultFloat3(0.4, 0.7, 0.5)]
+    float3 SunDirection;
+
+    [DefaultFloat3(1, 1, 1)]
+    float3 SpecularColor;
+
+    [DefaultFloat(0.2)]
+    float SpecularIntensity;
+
+    [DefaultFloat(16)]
+    float SpecularPower;
 )
 
 [Shader("vertex")]
@@ -45,15 +54,20 @@ float4 Fragment(VertexOutput i) : SV_Target
 {
     float3 normal = normalize(i.Normal);
 
-    float3 toLight = Parameters.Position - i.WorldPosition;
-
-    float distance = length(toLight);
-    float3 lightDir = toLight / max(distance, 0.0001);
+    float3 lightDir = normalize(Parameters.SunDirection);
 
     float diffuse = max(dot(normal, lightDir), 0.0);
-    float attenuation = 1.0 / (1.0 + distance * distance);
-    float ambient = 0.1;
-    float lighting = ambient + diffuse * Parameters.Intensity * attenuation;
+    float ambient = 0.4;
 
-    return float4(Parameters.Color * lighting, 1.0);
+    float3 viewDir = normalize(Camera.WorldPosition - i.WorldPosition);
+    float3 halfDir = normalize(lightDir + viewDir);
+    float specAngle = max(dot(normal, halfDir), 0.0);
+    float specular = pow(specAngle, Parameters.SpecularPower) * Parameters.SpecularIntensity;
+
+    specular *= step(0.0001, diffuse);
+
+    float lighting = ambient + diffuse * Parameters.Intensity;
+    float3 color = Parameters.Color * lighting + Parameters.SpecularColor * specular;
+
+    return float4(color, 1.0);
 }

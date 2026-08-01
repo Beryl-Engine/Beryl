@@ -49,7 +49,7 @@ internal sealed class Program
 			floor.Transform.Scale = new Vector3(10, 1, 10);
 
 			Mesh? cubeMesh = Application.ResourceProvider.GetResource<Mesh>("Assets/PrimitiveCube.fbx");
-			Shader? shader = Application.ResourceProvider.GetResource<Shader>("Assets/Beryl/Unlit.slang");
+			Shader? shader = Application.ResourceProvider.GetResource<Shader>("Assets/Beryl/DummyLit.slang");
 			cubeMesh?.Material = new(shader ?? throw new Exception("Shader not found"));
 
 			StaticProp prop = new();
