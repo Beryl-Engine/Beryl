@@ -47,6 +47,9 @@ static void Main(string[] args)
 ```
 
 ## Features
+### Modern C#
+Beryl fully embraces modern C# and it's features. Extensive use of properties, nullability, attributes, and abstraction means code can be more explicit and less based in guess work.
+
 ### Extreme Modularity
 All engine subsystems have their lifecycle hooked into the `Module` system. Because of this, subsystems can be arbitrarily disabled, profiled, or singled out for debugging.
 
@@ -60,7 +63,7 @@ if (Input.PrimaryHandLeft.IsButtonPressed(VirtualRealityController.Button.Action
 Logic is built around Entities and Components. Components are the reusable building blocks of the engine whilst Entities orchestrate their attached components to make more specific logic occur. For instance, a Button Entity would consist of `MeshRenderer`, `RigidBody`, and `Collider` components and contain logic that fires an output when an interaction ray hits the `Collider`.
 
 ### Vulkan Renderer
-Rendering is built on a Veldrid-based descriptor defined Vulkan-first engine with DirectX12 for compatibility. 'Descriptor Defined' means all CPU/GPU heterogeneous resources are built around a 'Descriptor' that defines their data and is then mapped to the GPU sided resource, allowing every resource to reuse buffers from eachother when possible.
+Rendering is built on a Veldrid-based 'Descriptor Defined' Vulkan-first engine with DirectX12 for compatibility.
 
 ### Slang Shaders
 ```slang
@@ -99,5 +102,3 @@ float4 Fragment(VertexOutput i) : SV_Target
 }
 ```
 
-### Modern C#
-Beryl has been written to be C# 14-first. Extensive use of properties, nullability, attributes, and abstraction means code can be more explicit and less based in guess work.
