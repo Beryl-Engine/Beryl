@@ -17,6 +17,7 @@ namespace Beryl.Scenes.Entities;
 public class Entity
 {
 	/// <summary> Is this entity enabled? </summary>
+	/// <remarks> Setting this will propogate the value down through all child <see cref="Component"/>s. </remarks>
 	public bool Enabled
 	{
 		get;
@@ -32,7 +33,7 @@ public class Entity
 	/// <summary> The name of the entity. </summary>
 	public string Name { get; set; } = "Entity";
 
-	/// <summary> The transform of the entity. </summary>
+	/// <summary> The <see cref="Components.Transform"/> used to derive entity position, rotation, and scale. </summary>
 	public Transform Transform { get; set; } = new();
 
 	/// <summary> The components attached to the entity. </summary>
@@ -119,7 +120,7 @@ public class Entity
 	}
 
 	/// <summary> Destroys the specified entity and releases any associated resources. </summary>
-	public void Destroy()
+	public virtual void Destroy()
 	{
 		Enabled = false;
 
