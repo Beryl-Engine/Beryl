@@ -40,13 +40,11 @@ public class Camera : Component
 		get
 		{
 			float f = 1f / Math.Math.Tan(FOV / 2f);
-			float yScale = Renderer.Device.Features.HasFlag(RHI.DeviceFeatures.ClipSpaceYInverted) ? -f : f; // Hacky, ideally ProjectionMatrix should be the same no matter the backend
-
 			float zRange = ZFar - ZNear;
 
 			return new Matrix4x4(
 				f / AspectRatio, 0, 0, 0,
-				0, yScale, 0, 0,
+				0, f, 0, 0,
 				0, 0, ZFar / zRange, 1,
 				0, 0, (-ZNear * ZFar) / zRange, 0
 			);
