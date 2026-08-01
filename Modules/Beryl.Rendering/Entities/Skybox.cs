@@ -19,9 +19,9 @@ public class Skybox : Entity
 	{
 		base.Start();
 
-		Mesh? skyMesh = Application.ResourceProvider.GetResource<Mesh>("Assets/PrimitiveCube.fbx");
+		Mesh skyMesh = Mesh.Cube;
 		Shader? sky = Application.ResourceProvider.GetResource<Shader>("Assets/Defaults/Sky.slang");
-		skyMesh?.Material = new(sky ?? throw new Exception("Skybox shader not found."));
+		skyMesh.Material = new(sky ?? throw new Exception("Skybox shader not found."));
 
 		Renderer.Mesh = skyMesh;
 	}

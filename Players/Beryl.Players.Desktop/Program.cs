@@ -41,13 +41,9 @@ internal sealed class Program
 			floor.Name = "Floor";
 			floor.Transform.Scale = new Vector3(10, 1, 10);
 
-			Mesh? cubeMesh = Application.ResourceProvider.GetResource<Mesh>("Assets/PrimitiveCube.fbx");
-			Shader? shader = Application.ResourceProvider.GetResource<Shader>("Assets/Defaults/DummyLit.slang");
-			cubeMesh?.Material = new(shader ?? throw new Exception("Shader not found"));
-
 			StaticProp prop = new();
-			prop.Transform.Position = new Vector3(0, 2, 0);
-			prop.Mesh = cubeMesh;
+			prop.Transform.Position = new Vector3(0, 1, 0);
+			prop.Mesh = Mesh.Cube;
 
 			ModuleManager.GetModule<SceneModule>()?.CurrentScene.StartAll();
 		};

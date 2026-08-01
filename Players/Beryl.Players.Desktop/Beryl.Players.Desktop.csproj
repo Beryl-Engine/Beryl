@@ -25,13 +25,4 @@
     <ProjectReference Include="..\..\Beryl.Serialization\Beryl.Serialization.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <None Update="Assets\PrimitiveCube.fbx">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="Assets\TranslateGizmo.fbx">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-
 </Project>

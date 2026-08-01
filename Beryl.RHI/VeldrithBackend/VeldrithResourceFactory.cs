@@ -154,8 +154,8 @@ internal sealed class VeldrithResourceFactory(VeldrithDevice device) : IResource
 
 	private static RasterizerStateDescription ToVeldrith(CullingMode culling) => culling switch
 	{
-		CullingMode.Back => new RasterizerStateDescription(FaceCullMode.Back, PolygonFillMode.Solid, FrontFace.CounterClockwise, true, true),
-		CullingMode.Front => new RasterizerStateDescription(FaceCullMode.Front, PolygonFillMode.Solid, FrontFace.CounterClockwise, true, true),
+		CullingMode.Back => new RasterizerStateDescription(FaceCullMode.Back, PolygonFillMode.Solid, FrontFace.Clockwise, true, true),
+		CullingMode.Front => new RasterizerStateDescription(FaceCullMode.Front, PolygonFillMode.Solid, FrontFace.Clockwise, true, true),
 		_ => RasterizerStateDescription.CULL_NONE
 	};
 

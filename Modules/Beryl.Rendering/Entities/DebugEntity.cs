@@ -1,7 +1,6 @@
 // This file is part of the Beryl Game Engine.
 // Licensed under the MIT license. (https://github.com/Beryl-Engine/Beryl/blob/main/LICENSE)
 
-using Beryl.Common;
 using Beryl.Common.Utility;
 using Beryl.Physics.Components;
 using Beryl.Physics.Components.Colliders;
@@ -31,10 +30,7 @@ public class DebugEntity : Entity
 		RigidBody.IsStatic = true;
 		RigidBody.Colliders.Add(new BoxCollider(1f, 1f, 1f));
 
-		var mesh = Application.ResourceProvider.GetResource<Mesh>("Assets/PrimitiveCube.fbx");
-
-		Renderer.Mesh = mesh;
-		Renderer.Mesh?.Material = Material.Default;
+		Renderer.Mesh = Mesh.Cube;
 
 		BerylConsole.Log("Debug entity started.");
 	}

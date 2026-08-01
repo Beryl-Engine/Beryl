@@ -16,7 +16,7 @@ namespace Beryl.Rendering.Entities;
 public class FlyController : Entity
 {
 	public float Sensitivity { get; set; } = 0.0025f;
-	public float Speed { get; set; } = 8f;
+	public float Speed { get; set; } = 5f;
 
 	[ImplicitComponent] 
 	protected Camera Camera { get; set; } = null!;
