@@ -12,7 +12,6 @@ using Beryl.Rendering;
 using Beryl.Rendering.Entities;
 using Beryl.Rendering.Resources;
 using Beryl.Scenes;
-using Beryl.VirtualReality;
 
 namespace Beryl.Desktop;
 
@@ -27,7 +26,6 @@ internal sealed class Program
 		ModuleManager.RegisterModule<SceneModule>();
 		ModuleManager.RegisterModule<AudioModule>();
 		ModuleManager.RegisterModule<GUIModule>();
-		ModuleManager.RegisterModule<VirtualRealityModule>();
 		ModuleManager.RegisterModule<RenderingModule>();
 
 		Application.OnStart += () =>
