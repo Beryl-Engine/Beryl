@@ -7,6 +7,7 @@ using Beryl.RHI.Resources;
 using Beryl.Rendering.Resources;
 using Beryl.RHI;
 using System.Runtime.InteropServices;
+using System.Runtime.CompilerServices;
 
 namespace Beryl.Rendering;
 
@@ -70,7 +71,7 @@ public sealed class GPUBuffer
 					break;
 
 				case { Type: ShaderParameter.ParamType.Vector, DefaultValue: ShaderValue.Vector v }:
-					AddFloats(v.Value);
+					AddSpan(v.Value, v.Value.Length > 2 ? 16 : 8); // Dumb
 					break;
 
 				case { Type: ShaderParameter.ParamType.SampledTexture2D, DefaultValue: ShaderValue.SampledTexture2D text }:
@@ -88,69 +89,14 @@ public sealed class GPUBuffer
 		}
 	}
 
-	public void AddInt(int value)
-	{
-		EnsurePacking(4, 4);
-		EnsureCapacity(offset + sizeof(int));
+	public void AddInt(int value) => AddPrimitive(value, 4);
 
-		Span<byte> dest = data.AsSpan(offset, 4);
-		BitConverter.TryWriteBytes(dest, value);
+	public void AddFloat(float value) => AddPrimitive(value, 4);
 
-		offset += 4;
-	}
 
-	public void AddFloat(float value)
-	{
-		EnsurePacking(4, 4);
-		EnsureCapacity(offset + sizeof(float));
-
-		Span<byte> dest = data.AsSpan(offset, 4);
-		BitConverter.TryWriteBytes(dest, value);
-
-		offset += 4;
-	}
-
-	public void AddFloats(ReadOnlySpan<float> values)
-	{
-		ReadOnlySpan<byte> byteVals = MemoryMarshal.Cast<float, byte>(values);
-
-		EnsurePacking(values.Length * 4, 4);
-		EnsureCapacity(offset + values.Length * sizeof(float));
-
-		byteVals.CopyTo(data.AsSpan(offset));
-
-		offset += values.Length * 4;
-	}
-
-	public void AddFloat2(float x, float y)
-	{
-		EnsurePacking(8, 8);
-		EnsureCapacity(offset + (sizeof(float) * 2));
-		BitConverter.TryWriteBytes(data.AsSpan(offset, 4), x);
-		BitConverter.TryWriteBytes(data.AsSpan(offset + 4, 4), y);
-		offset += 8;
-	}
-
-	public void AddFloat3(float x, float y, float z)
-	{
-		EnsurePacking(12, 16);
-		EnsureCapacity(offset + (sizeof(float) * 3));
-		BitConverter.TryWriteBytes(data.AsSpan(offset, 4), x);
-		BitConverter.TryWriteBytes(data.AsSpan(offset + 4, 4), y);
-		BitConverter.TryWriteBytes(data.AsSpan(offset + 8, 4), z);
-		offset += 12;
-	}
-
-	public void AddFloat4(float x, float y, float z, float w)
-	{
-		EnsurePacking(16, 16);
-		EnsureCapacity(offset + (sizeof(float) * 4));
-		BitConverter.TryWriteBytes(data.AsSpan(offset, 4), x);
-		BitConverter.TryWriteBytes(data.AsSpan(offset + 4, 4), y);
-		BitConverter.TryWriteBytes(data.AsSpan(offset + 8, 4), z);
-		BitConverter.TryWriteBytes(data.AsSpan(offset + 12, 4), w);
-		offset += 16;
-	}
+	public void AddFloat2(float x, float y) => AddSpan(stackalloc float[] { x, y }, 8);
+	public void AddFloat3(float x, float y, float z) => AddSpan(stackalloc float[] { x, y, z }, 12);
+	public void AddFloat4(float x, float y, float z, float w) => AddSpan(stackalloc float[] { x, y, z, w }, 16);
 
 	public void AddMatrix4x4(Matrix4x4 m)
 	{
@@ -160,12 +106,26 @@ public sealed class GPUBuffer
 		AddFloat4(m.M41, m.M42, m.M43, m.M44);
 	}
 
-	/// <summary> Adds raw bytes directly to the buffer (e.g. for structs via MemoryMarshal). </summary>
-	public void AddBytes(ReadOnlySpan<byte> bytes)
+	/// <summary> Writes an <see langword="unmanaged"/> value to the buffer with the given size and alignment. </summary>
+	public void AddPrimitive<T>(T value, int baseAlign) where T : unmanaged
 	{
-		EnsureCapacity(offset + bytes.Length);
-		bytes.CopyTo(data.AsSpan(offset));
-		offset += bytes.Length;
+		int size = Unsafe.SizeOf<T>(); // Much faster than Marshal.SizeOf
+
+		EnsurePacking(size, baseAlign);
+		EnsureCapacity(offset + size);
+		MemoryMarshal.Write(data.AsSpan(offset, size), in value);
+		offset += size;
+	}
+
+	/// <summary> Writes a <see cref="ReadOnlySpan{T}"/> of <see langword="unmanaged"/> values to the buffer with the given size and alignment. </summary>
+	public void AddSpan<T>(ReadOnlySpan<T> values, int baseAlign) where T : unmanaged
+	{
+		int size = values.Length * Unsafe.SizeOf<T>(); // Much faster than Marshal.SizeOf
+
+		EnsurePacking(size, baseAlign);
+		EnsureCapacity(offset + size);
+		MemoryMarshal.Cast<T, byte>(values).CopyTo(data.AsSpan(offset));
+		offset += size;
 	}
 
 	/// <summary> Resets the buffer to it's default state. </summary>
@@ -183,11 +143,8 @@ public sealed class GPUBuffer
 			aligned = Align(aligned, 16);
 
 		EnsureCapacity(aligned);
-		while (offset < aligned)
-		{
-			data[offset] = 0;
-			offset++;
-		}
+		data.AsSpan(offset, aligned - offset).Clear();
+		offset = aligned;
 	}
 
 	private void EnsureCapacity(int required)
