@@ -30,13 +30,8 @@ internal sealed class Program
 
 		Application.OnStart += () =>
 		{
-			Mesh? skyMesh = Application.ResourceProvider.GetResource<Mesh>("Assets/PrimitiveCube.fbx");
-			Shader? sky = Application.ResourceProvider.GetResource<Shader>("Assets/Defaults/Sky.slang");
-			skyMesh?.Material = new(sky ?? throw new Exception("Shader not found"));
-
-			StaticProp skyProp = new();
-			skyProp.Name = "Skybox";
-			skyProp.Mesh = skyMesh;
+			Skybox sky = new();
+			sky.Name = "Skybox";
 
 			// Setup debug scene
 			FlyController flyController = new();

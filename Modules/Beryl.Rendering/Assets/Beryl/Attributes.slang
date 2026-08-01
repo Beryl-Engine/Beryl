@@ -40,11 +40,6 @@ public struct DepthWriteAttribute
 };
 
 /// @brief Specifies how objects using this shader will test against the depth buffer.
-/// Valid values are:
-/// - `"Never"`: Never test against the depth buffer.
-/// - `"Always"`: Always test against the depth buffer.
-/// - `"Less"`: Test against the depth buffer and fail if the depth test fails.
-/// - `"Greater"`: Test against the depth buffer and fail if the depth test succeeds.
 SHADER_ATTRIBUTE
 public struct DepthTestAttribute
 {
