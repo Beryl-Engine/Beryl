@@ -5,6 +5,20 @@ using System.Collections.Immutable;
 
 namespace Beryl.RHI.Resources;
 
+// NOTE: This would be a good use for unions when we move to .NET 11
+
+/// <summary>
+/// Union type for shader values.
+/// </summary>
+public abstract record ShaderValue
+{
+	public record Int(int Value) : ShaderValue;
+	public record Float(float Value) : ShaderValue;
+	public record Matrix(params float[] Value) : ShaderValue;
+	public record Vector(params float[] Value) : ShaderValue;
+	public record SampledTexture2D() : ShaderValue;
+}
+
 /// <summary>
 /// Describes a parameter exposed by a shader.
 /// </summary>
@@ -22,9 +36,11 @@ public sealed class ShaderParameter
 
 	public string Name { get; }
 	public ParamType Type { get; }
-	public object? DefaultValue { get; }
 
-	public ShaderParameter(string name, ParamType type, object? defaultValue = null)
+	/// <summary> The specified default value of the parameter or null if it has no default value. </summary>
+	public ShaderValue? DefaultValue { get; }
+
+	public ShaderParameter(string name, ParamType type, ShaderValue? defaultValue = null)
 	{
 		Name = name;
 		Type = type;

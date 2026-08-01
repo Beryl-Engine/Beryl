@@ -6,6 +6,7 @@ using Beryl.Math;
 using Beryl.RHI.Resources;
 using Beryl.Rendering.Resources;
 using Beryl.RHI;
+using System.Runtime.InteropServices;
 
 namespace Beryl.Rendering;
 
@@ -60,27 +61,19 @@ public sealed class GPUBuffer
 		{
 			switch (param)
 			{
-				case { Type: ShaderParameter.ParamType.Float, DefaultValue: float f }:
-					AddFloat(f);
+				case { Type: ShaderParameter.ParamType.Float, DefaultValue: ShaderValue.Float f }:
+					AddFloat(f.Value);
 					break;
 
-				case { Type: ShaderParameter.ParamType.Int, DefaultValue: long i }:
-					AddInt((int)i);
+				case { Type: ShaderParameter.ParamType.Int, DefaultValue: ShaderValue.Int i }:
+					AddInt(i.Value);
 					break;
 
-				case { Type: ShaderParameter.ParamType.Vector, DefaultValue: Vector3 v }:
-					AddFloat3(v.X, v.Y, v.Z);
+				case { Type: ShaderParameter.ParamType.Vector, DefaultValue: ShaderValue.Vector v }:
+					AddFloats(v.Value);
 					break;
 
-				case { Type: ShaderParameter.ParamType.Vector, DefaultValue: Vector2 v }:
-					AddFloat2(v.X, v.Y);
-					break;
-
-				case { Type: ShaderParameter.ParamType.Vector, DefaultValue: Vector4 v }:
-					AddFloat4(v.X, v.Y, v.Z, v.W);
-					break;
-
-				case { Type: ShaderParameter.ParamType.SampledTexture2D, DefaultValue: Texture text }:
+				case { Type: ShaderParameter.ParamType.SampledTexture2D, DefaultValue: ShaderValue.SampledTexture2D text }:
 					// TODO
 					break;
 
@@ -98,7 +91,7 @@ public sealed class GPUBuffer
 	public void AddInt(int value)
 	{
 		EnsurePacking(4, 4);
-		EnsureCapacity(offset + 4);
+		EnsureCapacity(offset + sizeof(int));
 
 		Span<byte> dest = data.AsSpan(offset, 4);
 		BitConverter.TryWriteBytes(dest, value);
@@ -109,7 +102,7 @@ public sealed class GPUBuffer
 	public void AddFloat(float value)
 	{
 		EnsurePacking(4, 4);
-		EnsureCapacity(offset + 4);
+		EnsureCapacity(offset + sizeof(float));
 
 		Span<byte> dest = data.AsSpan(offset, 4);
 		BitConverter.TryWriteBytes(dest, value);
@@ -117,10 +110,22 @@ public sealed class GPUBuffer
 		offset += 4;
 	}
 
+	public void AddFloats(ReadOnlySpan<float> values)
+	{
+		ReadOnlySpan<byte> byteVals = MemoryMarshal.Cast<float, byte>(values);
+
+		EnsurePacking(values.Length * 4, 4);
+		EnsureCapacity(offset + values.Length * sizeof(float));
+
+		byteVals.CopyTo(data.AsSpan(offset));
+
+		offset += values.Length * 4;
+	}
+
 	public void AddFloat2(float x, float y)
 	{
 		EnsurePacking(8, 8);
-		EnsureCapacity(offset + 8);
+		EnsureCapacity(offset + (sizeof(float) * 2));
 		BitConverter.TryWriteBytes(data.AsSpan(offset, 4), x);
 		BitConverter.TryWriteBytes(data.AsSpan(offset + 4, 4), y);
 		offset += 8;
@@ -129,7 +134,7 @@ public sealed class GPUBuffer
 	public void AddFloat3(float x, float y, float z)
 	{
 		EnsurePacking(12, 16);
-		EnsureCapacity(offset + 12);
+		EnsureCapacity(offset + (sizeof(float) * 3));
 		BitConverter.TryWriteBytes(data.AsSpan(offset, 4), x);
 		BitConverter.TryWriteBytes(data.AsSpan(offset + 4, 4), y);
 		BitConverter.TryWriteBytes(data.AsSpan(offset + 8, 4), z);
@@ -139,7 +144,7 @@ public sealed class GPUBuffer
 	public void AddFloat4(float x, float y, float z, float w)
 	{
 		EnsurePacking(16, 16);
-		EnsureCapacity(offset + 16);
+		EnsureCapacity(offset + (sizeof(float) * 4));
 		BitConverter.TryWriteBytes(data.AsSpan(offset, 4), x);
 		BitConverter.TryWriteBytes(data.AsSpan(offset + 4, 4), y);
 		BitConverter.TryWriteBytes(data.AsSpan(offset + 8, 4), z);

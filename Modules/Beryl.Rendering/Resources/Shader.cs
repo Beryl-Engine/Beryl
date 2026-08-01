@@ -1,10 +1,8 @@
 // This file is part of the Beryl Game Engine.
 // Licensed under the MIT license. (https://github.com/Beryl-Engine/Beryl/blob/main/LICENSE)
 
-using Beryl.Common;
 using Beryl.Common.Resources.DefaultProvider;
 using Beryl.Common.Utility;
-using Beryl.Math;
 using Beryl.RHI.Resources;
 using SlangShaderSharp;
 using System.Collections.Immutable;
@@ -53,7 +51,7 @@ public class Shader
 						continue;
 					}
 
-					object? defaultValue = null;
+					ShaderValue? defaultValue = null;
 
 					for (uint j = 0; j < @field.Variable.AttributeCount; j++)
 					{
@@ -63,37 +61,27 @@ public class Shader
 						switch (attribute.Name)
 						{
 							case "DefaultFloat":
-								defaultValue = attribute.GetArgumentValueFloat(0);
+								defaultValue = new ShaderValue.Float(attribute.GetArgumentValueFloat(0));
 								break;
 
 							case "DefaultInt":
-								defaultValue = attribute.GetArgumentValueInt(0);
+								defaultValue = new ShaderValue.Int(attribute.GetArgumentValueInt(0));
 								break;
 
 							case "DefaultFloat2":
-								defaultValue = new Vector2(
-									attribute.GetArgumentValueFloat(0),
-									attribute.GetArgumentValueFloat(1));
+								defaultValue = new ShaderValue.Vector(attribute.GetArgumentValueFloat(0), attribute.GetArgumentValueFloat(1));
 								break;
 
 							case "DefaultFloat3":
-								defaultValue = new Vector3(
-									attribute.GetArgumentValueFloat(0),
-									attribute.GetArgumentValueFloat(1),
-									attribute.GetArgumentValueFloat(2));
+								defaultValue = new ShaderValue.Vector(attribute.GetArgumentValueFloat(0), attribute.GetArgumentValueFloat(1), attribute.GetArgumentValueFloat(2));
 								break;
 
 							case "DefaultFloat4":
-								defaultValue = new Vector4(
-									attribute.GetArgumentValueFloat(0),
-									attribute.GetArgumentValueFloat(1),
-									attribute.GetArgumentValueFloat(2),
-									attribute.GetArgumentValueFloat(3));
+								defaultValue = new ShaderValue.Vector(attribute.GetArgumentValueFloat(0), attribute.GetArgumentValueFloat(1), attribute.GetArgumentValueFloat(2), attribute.GetArgumentValueFloat(3));
 								break;
 
 							case "DefaultTexture":
-								defaultValue = Application.ResourceProvider.GetResource<Texture>(
-									attribute.GetArgumentValueString(0));
+								defaultValue = new ShaderValue.SampledTexture2D();
 								break;
 						}
 					}
