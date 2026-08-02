@@ -12,7 +12,7 @@ using Beryl.Scenes.Entities;
 
 namespace Beryl.Rendering.Entities;
 
-[Entity("fly_controller")]
+[Entity]
 public class FlyController : Entity
 {
 	public float Sensitivity { get; set; } = 0.0025f;

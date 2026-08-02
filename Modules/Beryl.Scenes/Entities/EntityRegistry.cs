@@ -24,7 +24,7 @@ public static class EntityRegistry
 			{
 				var attribute = entity.GetCustomAttribute<EntityAttribute>(false);
 				if (attribute != null)
-					RegisterFromType(attribute.Name, entity);
+					RegisterFromType(attribute.Name ?? entity.Name, entity);
 			}
 		}
 	}

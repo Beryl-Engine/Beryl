@@ -13,7 +13,7 @@ namespace Beryl.Rendering.Entities;
 /// <summary>
 /// Internal entity useful for debugging systems.
 /// </summary>
-[Entity("debug_entity")]
+[Entity]
 public class DebugEntity : Entity
 {
 	[ImplicitComponent]

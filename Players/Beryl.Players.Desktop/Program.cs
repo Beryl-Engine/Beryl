@@ -38,9 +38,9 @@ internal sealed class Program
 			DebugEntity floor = new();
 			floor.Transform.Scale = new Vector3(10, 1, 10);
 
-			StaticProp prop = new();
+			Prop prop = new();
 			prop.Transform.Position = new Vector3(0, 1, 0);
-			prop.Mesh = Mesh.Cube;
+			prop.Renderer.Mesh = Mesh.Cube;
 
 			ModuleManager.GetModule<SceneModule>()?.CurrentScene.StartAll();
 		};

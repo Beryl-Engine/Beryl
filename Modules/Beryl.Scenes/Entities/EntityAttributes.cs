@@ -9,11 +9,11 @@ namespace Beryl.Scenes.Entities;
 [AttributeUsage(AttributeTargets.Class)]
 public class EntityAttribute : Attribute
 {
-	/// <summary> The text name of the entity. (i.e. "my_awesome_entity") </summary>
-	public string Name { get; }
+	/// <summary> The text name of the entity or null if using the class name. (i.e. "MyAwesomeEntity")  </summary>
+	public string? Name { get; }
 
 	/// <summary> Initializes a new instance of the <see cref="EntityAttribute"/> class. </summary>
-	public EntityAttribute(string name)
+	public EntityAttribute(string? name = null)
 	{
 		Name = name;
 	}

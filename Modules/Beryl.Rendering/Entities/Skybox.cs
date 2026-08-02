@@ -8,7 +8,7 @@ using Beryl.Scenes.Entities;
 
 namespace Beryl.Rendering.Entities;
 
-[Entity("skybox")]
+[Entity]
 public class Skybox : Entity
 {
 	[ImplicitComponent]
