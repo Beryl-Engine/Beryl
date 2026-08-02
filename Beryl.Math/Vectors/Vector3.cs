@@ -118,28 +118,20 @@ public struct Vector3 : IEquatable<Vector3>
 	#endregion
 
 	#region Operators
-	public static Vector3 operator +(Vector3 a, Vector3 b)
-		=> new(a.X + b.X, a.Y + b.Y, a.Z + b.Z);
+	public static Vector3 operator +(Vector3 a, Vector3 b) => new(a.X + b.X, a.Y + b.Y, a.Z + b.Z);
 
-	public static Vector3 operator -(Vector3 a, Vector3 b)
-		=> new(a.X - b.X, a.Y - b.Y, a.Z - b.Z);
+	public static Vector3 operator -(Vector3 a, Vector3 b) => new(a.X - b.X, a.Y - b.Y, a.Z - b.Z);
 
-	public static Vector3 operator -(Vector3 v)
-		=> new(-v.X, -v.Y, -v.Z);
+	public static Vector3 operator -(Vector3 v) => new(-v.X, -v.Y, -v.Z);
 
-	public static Vector3 operator *(Vector3 a, float scalar)
-		=> new(a.X * scalar, a.Y * scalar, a.Z * scalar);
+	public static Vector3 operator *(Vector3 a, float scalar) => new(a.X * scalar, a.Y * scalar, a.Z * scalar);
 
-	public static Vector3 operator *(float scalar, Vector3 a)
-		=> new(a.X * scalar, a.Y * scalar, a.Z * scalar);
+	public static Vector3 operator *(float scalar, Vector3 a) => new(a.X * scalar, a.Y * scalar, a.Z * scalar);
 
-	public static Vector3 operator /(Vector3 a, float scalar)
-		=> new(a.X / scalar, a.Y / scalar, a.Z / scalar);
+	public static Vector3 operator /(Vector3 a, float scalar) => new(a.X / scalar, a.Y / scalar, a.Z / scalar);
 
-	public static bool operator ==(Vector3 a, Vector3 b)
-		=> a.X == b.X && a.Y == b.Y && a.Z == b.Z;
+	public static bool operator ==(Vector3 a, Vector3 b) => a.X == b.X && a.Y == b.Y && a.Z == b.Z;
 
-	public static bool operator !=(Vector3 a, Vector3 b)
-		=> !(a == b);
+	public static bool operator !=(Vector3 a, Vector3 b) => !(a == b);
 	#endregion
 }

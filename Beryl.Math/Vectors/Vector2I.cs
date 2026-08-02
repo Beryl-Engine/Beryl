@@ -64,25 +64,18 @@ public struct Vector2I : IEquatable<Vector2I>
 	public override string ToString() => $"({X}, {Y})";
 
 	#region Operators
-	public static Vector2I operator +(Vector2I a, Vector2I b)
-		=> new(a.X + b.X, a.Y + b.Y);
+	public static Vector2I operator +(Vector2I a, Vector2I b) => new(a.X + b.X, a.Y + b.Y);
 
-	public static Vector2I operator -(Vector2I a, Vector2I b)
-		=> new(a.X - b.X, a.Y - b.Y);
+	public static Vector2I operator -(Vector2I a, Vector2I b) => new(a.X - b.X, a.Y - b.Y);
 
-	public static Vector2I operator -(Vector2I v)
-		=> new(-v.X, -v.Y);
+	public static Vector2I operator -(Vector2I v) => new(-v.X, -v.Y);
 
-	public static Vector2I operator *(Vector2I a, int scalar)
-		=> new(a.X * scalar, a.Y * scalar);
+	public static Vector2I operator *(Vector2I a, int scalar) => new(a.X * scalar, a.Y * scalar);
 
-	public static Vector2I operator *(int scalar, Vector2I a)
-		=> new(a.X * scalar, a.Y * scalar);
+	public static Vector2I operator *(int scalar, Vector2I a) => new(a.X * scalar, a.Y * scalar);
 
-	public static bool operator ==(Vector2I a, Vector2I b)
-		=> a.X == b.X && a.Y == b.Y;
+	public static bool operator ==(Vector2I a, Vector2I b) => a.X == b.X && a.Y == b.Y;
 
-	public static bool operator !=(Vector2I a, Vector2I b)
-		=> !(a == b);
+	public static bool operator !=(Vector2I a, Vector2I b) => !(a == b);
 	#endregion
 }

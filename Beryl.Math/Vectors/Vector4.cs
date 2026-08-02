@@ -111,29 +111,21 @@ public struct Vector4 : IEquatable<Vector4>
 	#endregion
 
 	#region Operators
-	public static Vector4 operator +(Vector4 a, Vector4 b)
-		=> new(a.X + b.X, a.Y + b.Y, a.Z + b.Z, a.W + b.W);
+	public static Vector4 operator +(Vector4 a, Vector4 b) => new(a.X + b.X, a.Y + b.Y, a.Z + b.Z, a.W + b.W);
 
-	public static Vector4 operator -(Vector4 a, Vector4 b)
-		=> new(a.X - b.X, a.Y - b.Y, a.Z - b.Z, a.W - b.W);
+	public static Vector4 operator -(Vector4 a, Vector4 b) => new(a.X - b.X, a.Y - b.Y, a.Z - b.Z, a.W - b.W);
 
-	public static Vector4 operator -(Vector4 v)
-		=> new(-v.X, -v.Y, -v.Z, -v.W);
+	public static Vector4 operator -(Vector4 v) => new(-v.X, -v.Y, -v.Z, -v.W);
 
-	public static Vector4 operator *(Vector4 a, float scalar)
-		=> new(a.X * scalar, a.Y * scalar, a.Z * scalar, a.W * scalar);
+	public static Vector4 operator *(Vector4 a, float scalar) => new(a.X * scalar, a.Y * scalar, a.Z * scalar, a.W * scalar);
 
-	public static Vector4 operator *(float scalar, Vector4 a)
-		=> new(a.X * scalar, a.Y * scalar, a.Z * scalar, a.W * scalar);
+	public static Vector4 operator *(float scalar, Vector4 a) => new(a.X * scalar, a.Y * scalar, a.Z * scalar, a.W * scalar);
 
-	public static Vector4 operator /(Vector4 a, float scalar)
-		=> new(a.X / scalar, a.Y / scalar, a.Z / scalar, a.W / scalar);
+	public static Vector4 operator /(Vector4 a, float scalar) => new(a.X / scalar, a.Y / scalar, a.Z / scalar, a.W / scalar);
 
-	public static bool operator ==(Vector4 a, Vector4 b)
-		=> a.X == b.X && a.Y == b.Y && a.Z == b.Z && a.W == b.W;
+	public static bool operator ==(Vector4 a, Vector4 b) => a.X == b.X && a.Y == b.Y && a.Z == b.Z && a.W == b.W;
 
-	public static bool operator !=(Vector4 a, Vector4 b)
-		=> !(a == b);
+	public static bool operator !=(Vector4 a, Vector4 b) => !(a == b);
 	#endregion
 }
 

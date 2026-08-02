@@ -88,28 +88,20 @@ public struct Vector2 : IEquatable<Vector2>
 	#endregion
 
 	#region Operators
-	public static Vector2 operator +(Vector2 a, Vector2 b)
-		=> new(a.X + b.X, a.Y + b.Y);
+	public static Vector2 operator +(Vector2 a, Vector2 b) => new(a.X + b.X, a.Y + b.Y);
 
-	public static Vector2 operator -(Vector2 a, Vector2 b)
-		=> new(a.X - b.X, a.Y - b.Y);
+	public static Vector2 operator -(Vector2 a, Vector2 b) => new(a.X - b.X, a.Y - b.Y);
 
-	public static Vector2 operator -(Vector2 v)
-		=> new(-v.X, -v.Y);
+	public static Vector2 operator -(Vector2 v) => new(-v.X, -v.Y);
 
-	public static Vector2 operator *(Vector2 a, float scalar)
-		=> new(a.X * scalar, a.Y * scalar);
+	public static Vector2 operator *(Vector2 a, float scalar) => new(a.X * scalar, a.Y * scalar);
 
-	public static Vector2 operator *(float scalar, Vector2 a)
-		=> new(a.X * scalar, a.Y * scalar);
+	public static Vector2 operator *(float scalar, Vector2 a) => new(a.X * scalar, a.Y * scalar);
 
-	public static Vector2 operator /(Vector2 a, float scalar)
-		=> new(a.X / scalar, a.Y / scalar);
+	public static Vector2 operator /(Vector2 a, float scalar) => new(a.X / scalar, a.Y / scalar);
 
-	public static bool operator ==(Vector2 a, Vector2 b)
-		=> a.X == b.X && a.Y == b.Y;
+	public static bool operator ==(Vector2 a, Vector2 b) => a.X == b.X && a.Y == b.Y;
 
-	public static bool operator !=(Vector2 a, Vector2 b)
-		=> !(a == b);
+	public static bool operator !=(Vector2 a, Vector2 b) => !(a == b);
 	#endregion
 }
