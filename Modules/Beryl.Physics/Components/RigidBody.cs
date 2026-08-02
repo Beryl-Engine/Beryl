@@ -16,7 +16,7 @@ namespace Beryl.Physics.Components;
 /// </summary>
 public class RigidBody : Component
 {
-	internal IPhysicsBody InternalBody { get; private set; } = null!;
+	internal IPhysicsBody? InternalBody { get; private set; }
 
 	/// <summary> All <see cref="ICollider"/>s that define the shape of this <see cref="RigidBody"/>. </summary>
 	public ObservableCollection<ICollider> Colliders { get; } = new();
@@ -51,24 +51,20 @@ public class RigidBody : Component
 	/// <inheritdoc/>
 	public Vector2 Damping { get => InternalBody?.Damping ?? Vector2.Zero; set => InternalBody?.Damping = value; }
 
+	public RigidBody()
+	{
+		var physics = ModuleManager.GetModule<PhysicsModule>();
+		InternalBody = physics?.World.CreateBody(Entity);
+
+		Colliders.CollectionChanged += OnCollidersModified;
+	}
+
 	/// <inheritdoc/>
 	public override void Start()
 	{
 		base.Start();
 
-		Colliders.CollectionChanged += OnCollidersModified;
-
-		var physics = ModuleManager.GetModule<PhysicsModule>();
-		if (physics == null)
-			return;
-
-		InternalBody = physics.World.CreateBody(Entity);
-
-		if (InternalBody != null)
-			InternalBody.Position = Entity.Transform.Position;
-
-		foreach (var collider in Colliders)
-			collider.AddTo(this);
+		InternalBody?.Position = Entity.Transform.Position;
 	}
 
 	/// <inheritdoc/>

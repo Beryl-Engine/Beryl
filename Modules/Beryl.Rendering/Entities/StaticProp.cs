@@ -10,16 +10,8 @@ namespace Beryl.Rendering.Entities;
 [Entity("static_prop")]
 public class StaticProp : Entity
 {
-	public Mesh? Mesh { get; set; }
+	public Mesh? Mesh { get => Renderer.Mesh; set => Renderer.Mesh = value; }
 
 	[ImplicitComponent]
 	protected MeshRenderer Renderer { get; } = null!;
-
-	/// <inheritdoc/>
-	public override void Start()
-	{
-		base.Start();
-
-		Renderer.Mesh = Mesh;
-	}
 }

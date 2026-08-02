@@ -18,14 +18,12 @@ public class Jitter2Body : IPhysicsBody
 	public Entity? Owner { get; init; }
 
 	internal readonly RigidBody? body;
-	private readonly Dictionary<RigidBody, Jitter2Body> bodyMap;
 	private readonly Dictionary<int, RigidBodyShape> shapes = new();
 	private int nextId = 0;
 
 	internal Jitter2Body(RigidBody body, Dictionary<RigidBody, Jitter2Body> bodyMap)
 	{
 		this.body = body;
-		this.bodyMap = bodyMap;
 
 		body.BeginCollide += (arb) =>
 		{
@@ -122,7 +120,7 @@ public class Jitter2Body : IPhysicsBody
 		if (body == null)
 			return -1;
 
-		RigidBodyShape shape = new BoxShape(width * 2, height * 2, depth * 2);
+		RigidBodyShape shape = new BoxShape(width, height, depth);
 		body.AddShape(shape);
 		shapes[nextId] = shape;
 		return nextId++;

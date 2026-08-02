@@ -15,5 +15,5 @@ public struct SphereCollider : ICollider
 	public SphereCollider() : this(1f) {}
 
 	/// <inheritdoc/>
-	public void AddTo(RigidBody rb) => ShapeID = rb.InternalBody.AddSphereCollider(Radius);
+	public void AddTo(RigidBody rb) => ShapeID = rb.InternalBody?.AddSphereCollider(Radius) ?? -1;
 }

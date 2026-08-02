@@ -13,6 +13,6 @@ public interface ICollider
 	void RemoveFrom(RigidBody rb)
 	{
 		if (ShapeID != -1)
-			rb.InternalBody.RemoveCollider(ShapeID);
+			rb.InternalBody?.RemoveCollider(ShapeID);
 	}
 }

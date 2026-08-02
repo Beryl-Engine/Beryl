@@ -21,5 +21,5 @@ public struct BoxCollider : ICollider
 	public BoxCollider() : this(1f, 1f, 1f) {}
 
 	/// <inheritdoc/>
-	public void AddTo(RigidBody rb) => ShapeID = rb.InternalBody.AddBoxCollider(Width, Height, Depth);
+	public void AddTo(RigidBody rb) => ShapeID = rb.InternalBody?.AddBoxCollider(Width, Height, Depth) ?? -1;
 }
