@@ -12,6 +12,9 @@ Free & Open Source Game Engine built for lovers of C#.
 
 ## About
 Beryl is a cross-platform, MIT licensed, 3D-Focused game engine that fully embraces modern C#. It's designed for developers looking for an engine they'll enjoy using, no messy abstractions, no interop artifacts, and no licensing concerns.
+<p align="left">
+  <img src="https://raw.githubusercontent.com/Beryl-Engine/Branding/refs/heads/main/showcase/blocks.gif" alt="Beryl Banner" width="700">
+</p>
 
 ## Getting Started
 Once you have a `.csproj` that depends on all Beryl libraries your game will use, you can start the engine through an entry-point that look a bit like this:
