@@ -20,7 +20,7 @@ public class OpaquePass : RenderPass
 		foreach ((IClientRenderable Renderable, Matrix4x4 Transform) renderable in frame.Renderables)
 		{
 			if (renderable.Renderable.Material.Shader.Pass == "Opaque")
-				buffer.Draw(renderable.Renderable, renderable.Transform);
+				buffer.DrawImmediate(renderable.Renderable, renderable.Transform);
 		}
 	}
 }

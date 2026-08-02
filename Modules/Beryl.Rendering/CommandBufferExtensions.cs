@@ -33,8 +33,9 @@ public static class CommandBufferExtensions
 			cmd.UpdateBuffer(buffer.Resource, 0, data);
 		}
 
+
 		/// <summary> Draws a mesh. </summary>
-		public void Draw(ReadOnlySpan<Vector3> vertices, ReadOnlySpan<Vector3> normals, ReadOnlySpan<Vector2> uvs, ReadOnlySpan<uint> indices, Matrix4x4 transform, Material material)
+		public void DrawImmediate(ReadOnlySpan<Vector3> vertices, ReadOnlySpan<Vector3> normals, ReadOnlySpan<Vector2> uvs, ReadOnlySpan<uint> indices, Matrix4x4 transform, Material material)
 		{
 			if (cmd.CurrentFramebuffer == null)
 			{
@@ -67,7 +68,7 @@ public static class CommandBufferExtensions
 		}
 
 		/// <summary> Draws a <see cref="IClientRenderable"/> with the given transform <see cref="Matrix4x4"/> and <see cref="Material"/>. </summary>
-		public void Draw(IClientRenderable renderable, Matrix4x4 transform) => cmd.Draw(renderable.Vertices, renderable.Normals, renderable.UVs, renderable.Indices, transform, renderable.Material);
+		public void DrawImmediate(IClientRenderable renderable, Matrix4x4 transform) => cmd.DrawImmediate(renderable.Vertices, renderable.Normals, renderable.UVs, renderable.Indices, transform, renderable.Material);
 	}
 
 	private static void BindShaderResources(ICommandBuffer cmd, Shader shader)
