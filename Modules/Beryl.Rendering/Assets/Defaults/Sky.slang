@@ -8,9 +8,9 @@ import Beryl.Attributes;
 
 SHADER_ATTRIBUTES(
 	[ShaderPass("Opaque")]
-    [CullMode("None")]
-    [DepthWrite("Off")]
-    [DepthTest("LessOrEqual")]
+    [CullMode(CullingMode::Front)]
+    [DepthWrite(DepthWriteMode::Off)]
+    [DepthTest(DepthTestMode::LessOrEqual)]
 )
 
 SHADER_PARAMETERS(

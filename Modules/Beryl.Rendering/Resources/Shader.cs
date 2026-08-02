@@ -41,19 +41,19 @@ public class Shader
 
 				if (attribute.Name == "CullMode")
 				{
-					if (Enum.TryParse(attribute.GetArgumentValueString(0), true, out CullingMode mode))
-						CullingMode = mode;
+					if (Enum.IsDefined(typeof(CullingMode), attribute.GetArgumentValueInt(0)))
+						CullingMode = (CullingMode)attribute.GetArgumentValueInt(0);
 					else
-						BerylConsole.Warning($"Unsupported culling mode '{attribute.GetArgumentValueString(0)}'.");
+						BerylConsole.Warning($"Unsupported culling mode '{attribute.GetArgumentValueInt(0)}'.");
 				}
 
 				if (attribute.Name == "DepthWrite")
 				{
-					string mode = attribute.GetArgumentValueString(0);
+					int mode = attribute.GetArgumentValueInt(0);
 
-					if (mode == "On")
+					if (mode == 1)
 						DepthWrite = true;
-					else if (mode == "Off")
+					else if (mode == 0)
 						DepthWrite = false;
 					else
 						BerylConsole.Warning($"Unsupported depth write mode '{mode}'.");
@@ -61,10 +61,10 @@ public class Shader
 
 				if (attribute.Name == "DepthTest")
 				{
-					if (Enum.TryParse(attribute.GetArgumentValueString(0), true, out ComparisonMode mode))
-						DepthComparison = mode;
+					if (Enum.IsDefined(typeof(ComparisonMode), attribute.GetArgumentValueInt(0)))
+						DepthComparison = (ComparisonMode)attribute.GetArgumentValueInt(0);
 					else
-						BerylConsole.Warning($"Unsupported depth test mode '{attribute.GetArgumentValueString(0)}'.");
+						BerylConsole.Warning($"Unsupported depth test mode '{attribute.GetArgumentValueInt(0)}'.");
 				}
 			}
 

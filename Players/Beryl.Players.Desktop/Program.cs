@@ -31,14 +31,11 @@ internal sealed class Program
 		Application.OnStart += () =>
 		{
 			Skybox sky = new();
-			sky.Name = "Skybox";
 
 			// Setup debug scene
 			FlyController flyController = new();
-			flyController.Name = "Camera";
 
 			DebugEntity floor = new();
-			floor.Name = "Floor";
 			floor.Transform.Scale = new Vector3(10, 1, 10);
 
 			StaticProp prop = new();

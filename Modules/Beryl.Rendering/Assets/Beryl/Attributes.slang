@@ -4,7 +4,38 @@
 module Attributes;
 
 // -----------------------------------------------------------------------------
-// Shader Parameters.
+// Shader Attribute Enums.
+// NOTE: Translation and usage of these are handled in Shader.cs,
+// be careful when making changes!
+// -----------------------------------------------------------------------------
+
+public enum CullingMode
+{
+    None,
+    Front,
+    Back
+};
+
+public enum DepthWriteMode
+{
+    Off,
+    On
+};
+
+public enum DepthTestMode
+{
+    Never,
+    Always,
+    Less,
+    Equal,
+    LessOrEqual,
+    Greater,
+    NotEqual,
+    GreaterOrEqual
+};
+
+// -----------------------------------------------------------------------------
+// Shader Attributes.
 // -----------------------------------------------------------------------------
 
 #define SHADER_ATTRIBUTE [__AttributeUsage(_AttributeTargets.Struct)]
@@ -17,33 +48,24 @@ public struct ShaderPassAttribute
 };
 
 /// @brief Specifies how objects using this shader will be culled.
-///
-/// Valid values are:
-/// - `"None"`: Disable face culling.
-/// - `"Front"`: Cull front-facing polygons.
-/// - `"Back"`: Cull back-facing polygons.
 SHADER_ATTRIBUTE
 public struct CullModeAttribute
 {
-    string modeName;
+    CullingMode mode;
 };
 
 /// @brief Specifies how objects using this shader will be written to the depth buffer.
-///
-/// Valid values are:
-/// - `"Off"`: Do not write to the depth buffer.
-/// - `"On"`: Write to the depth buffer.
 SHADER_ATTRIBUTE
 public struct DepthWriteAttribute
 {
-    string modeName;
+    DepthWriteMode mode;
 };
 
 /// @brief Specifies how objects using this shader will test against the depth buffer.
 SHADER_ATTRIBUTE
 public struct DepthTestAttribute
 {
-    string modeName;
+    DepthTestMode mode;
 };
 
 // -----------------------------------------------------------------------------
