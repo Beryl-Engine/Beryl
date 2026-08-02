@@ -92,8 +92,20 @@ internal abstract class StringConverter<T>
 internal sealed class StringStringConverter : StringConverter<string>
 {
 	/// <inheritdoc/>
-	public override string ConvertToString(string value) => value;
+	public override string ConvertToString(string value) => $"\"{value}\"";
 
 	/// <inheritdoc/>
-	public override string ConvertFromString(string value) => value;
+	public override string ConvertFromString(string value)
+	{
+		if (string.IsNullOrEmpty(value))
+			return value;
+
+		if (value.StartsWith("\"") && value.EndsWith("\"") && value.Length >= 2)
+			return value.Substring(1, value.Length - 2);
+
+		if (value.StartsWith("'") && value.EndsWith("'") && value.Length >= 2)
+			return value.Substring(1, value.Length - 2);
+
+		return value;
+	}
 }

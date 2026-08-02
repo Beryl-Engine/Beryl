@@ -24,4 +24,10 @@
     <ProjectReference Include="..\..\Beryl.Serialization\Beryl.Serialization.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="ProjectInfo.beryl">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>

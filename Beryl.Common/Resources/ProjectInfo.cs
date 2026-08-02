@@ -1,10 +1,8 @@
 // This file is part of the Beryl Game Engine.
 // Licensed under the MIT license. (https://github.com/Beryl-Engine/Beryl/blob/main/LICENSE)
 
-
 using Beryl.Common.Resources.DefaultProvider;
 using System.Reflection;
-using System.Text;
 
 namespace Beryl.Common.Resources;
 
@@ -30,9 +28,5 @@ public readonly struct GraphicsInfo
 internal sealed class ProjectInfoLoader : ResourceLoader<ProjectInfo>
 {
 	/// <inheritdoc/>
-	public override ProjectInfo? LoadResource(byte[] data, string? name = null)
-	{
-		string yaml = Encoding.UTF8.GetString(data);
-		return null;
-	}
+	public override ProjectInfo? LoadResource(byte[] data, string? name = null) => Serialization.Serialization.Deserialize<ProjectInfo>(data);
 }
