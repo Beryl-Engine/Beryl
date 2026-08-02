@@ -64,9 +64,11 @@ Beryl fully embraces modern C# and it's features. Extensive use of properties, n
 All engine subsystems have their lifecycle hooked into the `Module` system. Because of this, subsystems can be arbitrarily disabled, profiled, or singled out for debugging.
 
 ```csharp
-if (Input.PrimaryHandLeft.IsButtonPressed(VirtualRealityController.Button.ActionUp))
-  if (ModuleManager.GetModule<PhysicsModule>()?.World.TryRaycast(Transform.Position, Transform.Forward, 1f, out RaycastResult result) == true)
-    EngineConsole.Log(result.Body.Owner?.Name ?? "null");
+if (ModuleManager.GetModule<InputModule>()?.PrimaryKeyboard?.IsKeyPressed(Keyboard.Key.E) == true)
+{
+	if (ModuleManager.GetModule<PhysicsModule>()?.World.TryRaycast(Transform.Position, Transform.Forward, 100f, out var hit) == true)
+		BerylConsole.Log(hit.Body.Owner?.Name);
+}
 ```
 
 ### Entity System
