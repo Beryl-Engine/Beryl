@@ -33,7 +33,6 @@ static void Main(string[] args)
         flyController.Name = "Camera";
 
         DebugEntity floor = new();
-        floor.Name = "Floor";
         floor.Transform.Scale = new Vector3(10, 1, 10);
 
         DebugEntity cube = new();
