@@ -162,6 +162,7 @@ public readonly ref struct ResourceDescriptor(IResourceLayout layout, ReadOnlySp
 		hash.Add(Layout);
 		foreach (IBindableResource resource in BoundResources)
 			hash.Add(resource);
+
 		return hash.ToHashCode();
 	}
 }
@@ -174,14 +175,25 @@ public readonly ref struct ShaderDescriptor(ReadOnlySpan<byte> bytecode, ShaderS
 	/// <inheritdoc/>
 	public override int GetHashCode()
 	{
-		unchecked
+		// We cant hash all the bytecode because that would be VERY expensive so we just hash the first and last 16 bytes
+		// This will cause collisions in the future!!!!!! someone who knows what theyre doing: help !!!!!!
+		var hash = new HashCode();
+
+		hash.Add(Stage);
+		hash.Add(Bytecode.Length);
+
+		if (!Bytecode.IsEmpty)
 		{
-			int hash = 17;
+			hash.Add(Bytecode[0]);
+			hash.Add(Bytecode[^1]);
 
-			foreach (byte b in Bytecode)
-				hash = hash * 31 + b;
-
-			return hash;
+			if (Bytecode.Length > 16)
+			{
+				hash.Add(Bytecode[8]);
+				hash.Add(Bytecode[^9]);
+			}
 		}
+
+		return hash.ToHashCode();
 	}
 }
