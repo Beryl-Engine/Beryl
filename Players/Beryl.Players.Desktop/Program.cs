@@ -8,6 +8,7 @@ using Beryl.GUI;
 using Beryl.Input;
 using Beryl.Math;
 using Beryl.Physics;
+using Beryl.Physics.Components.Colliders;
 using Beryl.Rendering;
 using Beryl.Rendering.Entities;
 using Beryl.Rendering.Resources;
@@ -35,12 +36,17 @@ internal sealed class Program
 			// Setup debug scene
 			FlyController flyController = new();
 
-			DebugEntity floor = new();
+			Prop floor = new() { PhysicsMode = PropPhysicsMode.Static };
 			floor.Transform.Scale = new Vector3(10, 1, 10);
+			floor.Renderer.Mesh = Mesh.Plane;
 
-			Prop prop = new();
-			prop.Transform.Position = new Vector3(0, 1, 0);
+			floor.RigidBody.Colliders.Add(new BoxCollider(10, 0.01f, 10));
+
+			Prop prop = new() { PhysicsMode = PropPhysicsMode.Dynamic };
+			prop.Transform.Position = new Vector3(0, 0.5f, 0);
 			prop.Renderer.Mesh = Mesh.Cube;
+
+			prop.RigidBody.Colliders.Add(new BoxCollider(1, 1, 1));
 
 			ModuleManager.GetModule<SceneModule>()?.CurrentScene.StartAll();
 		};
