@@ -23,7 +23,6 @@ static void Main(string[] args)
 {
     // Register all Modules our game wants to use
     ModuleManager.RegisterModule<InputModule>();
-    ModuleManager.RegisterModule<AssemblyModule>();
     ModuleManager.RegisterModule<PhysicsModule>();
     ModuleManager.RegisterModule<SceneModule>();
     ModuleManager.RegisterModule<AudioModule>();
