@@ -138,7 +138,7 @@ public class Entity
 
 	#region Component Methods
 	/// <summary> Adds a component to the entity. </summary>
-	protected Component AddComponent(Component component)
+	public Component AddComponent(Component component)
 	{
 		component.Entity = this;
 		components.Add(component);
@@ -146,11 +146,11 @@ public class Entity
 		return component;
 	}
 
+	/// <summary> Adds a new component of type T to the entity. </summary>
+	public T AddComponent<T>() where T : Component, new() => (T)AddComponent(new T());
+
 	/// <summary> Gets a component of type T from the entity. </summary>
 	protected T? GetComponent<T>() where T : Component => (T?)components.Find(c => c is T);
-
-	/// <summary> Adds a new component of type T to the entity. </summary>
-	protected T AddComponent<T>() where T : Component, new() => (T)AddComponent(new T());
 
 	/// <summary> Gets a component of type T from the entity or adds a new one if it doesn't exist. </summary>
 	protected T GetOrAddComponent<T>() where T : Component, new() => GetComponent<T>() ?? AddComponent<T>();

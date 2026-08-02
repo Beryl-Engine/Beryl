@@ -42,11 +42,11 @@ internal sealed class Program
 
 			floor.RigidBody.Colliders.Add(new BoxCollider(10, 0.01f, 10));
 
-			Prop prop = new() { PhysicsMode = PropPhysicsMode.Dynamic };
-			prop.Transform.Position = new Vector3(0, 0.5f, 0);
-			prop.Renderer.Mesh = Mesh.Cube;
+			Prop cube = new() { PhysicsMode = PropPhysicsMode.Dynamic };
+			cube.Transform.Position = new Vector3(0, 10f, 0);
+			cube.Renderer.Mesh = Mesh.Cube;
 
-			prop.RigidBody.Colliders.Add(new BoxCollider(1, 1, 1));
+			cube.RigidBody.Colliders.Add(new BoxCollider(1, 1, 1));
 
 			ModuleManager.GetModule<SceneModule>()?.CurrentScene.StartAll();
 		};
