@@ -95,8 +95,9 @@ public class RigidBody : Component
 			physics?.World?.DestroyBody(InternalBody);
 	}
 
-	/// <inheritdoc/>
 	public void AddForce(Vector3 force) => InternalBody?.AddForce(force);
+
+	public void MovePosition(Vector3 position) => InternalBody?.Position = position;
 
 	private void OnCollidersModified(object? sender, NotifyCollectionChangedEventArgs e)
 	{
