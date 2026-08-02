@@ -28,17 +28,19 @@ static void Main(string[] args)
 
     Application.OnStart += () =>
     {
-        // Setup a scene!
-        FlyController flyController = new();
-        flyController.Name = "Camera";
+			// Setup a scene!
+			Skybox sky = new();
 
-        DebugEntity floor = new();
-        floor.Transform.Scale = new Vector3(10, 1, 10);
+			FlyController flyController = new();
 
-        DebugEntity cube = new();
-        cube.Transform.Position = new Vector3(0, 2, 0);
+			DebugEntity floor = new();
+			floor.Transform.Scale = new Vector3(10, 1, 10);
 
-        ModuleManager.GetModule<SceneModule>()?.CurrentScene.StartAll();
+			StaticProp prop = new();
+			prop.Transform.Position = new Vector3(0, 1, 0);
+			prop.Mesh = Mesh.Cube;
+
+			ModuleManager.GetModule<SceneModule>()?.CurrentScene.StartAll();
     };
 
     Application.Initialize();
