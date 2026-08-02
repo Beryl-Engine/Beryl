@@ -11,9 +11,6 @@ namespace Beryl.Rendering;
 
 public static class Renderer
 {
-	/// <summary> The options for the renderer. </summary>
-	public static RendererOptions Options { get; private set; }
-
 	/// <summary> The renderer backend in use. </summary>
 	public static RendererBackend Backend { get; private set; }
 
@@ -26,10 +23,8 @@ public static class Renderer
 	/// <summary> Initializes the desired backend. Should be called once after window loading. </summary>
 	/// <param name="window"> The window to initialize the backend for. </param>
 	/// <param name="backend"> The backend to initialize. </param>
-	public static void Initialize(IWindow window, RendererBackend? backend = null, RendererOptions options = default)
+	public static void Initialize(IWindow window, RendererBackend? backend = null)
 	{
-		Options = options;
-
 		if (backend is null)
 		{
 			backend = GraphicsDeviceFactory.IsBackendSupported(RendererBackend.Vulkan)

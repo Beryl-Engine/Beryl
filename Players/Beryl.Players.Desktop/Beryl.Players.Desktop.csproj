@@ -12,7 +12,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Modules\Beryl.Assemblies\Beryl.Assemblies.csproj" />
     <ProjectReference Include="..\..\Modules\Beryl.Audio\Beryl.Audio.csproj" />
     <ProjectReference Include="..\..\Modules\Beryl.GUI\Beryl.GUI.csproj" />
     <ProjectReference Include="..\..\Modules\Beryl.Input\Beryl.Input.csproj" />

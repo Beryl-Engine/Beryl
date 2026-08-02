@@ -3,32 +3,18 @@
 
 using System.Runtime.Loader;
 
-using Beryl.Common;
-
 namespace Beryl.Assemblies;
 
-/// <summary>
-/// Module responsible for management of external assemblies.
-/// </summary>
-public class AssemblyModule : BaseModule
+public static class Assemblies
 {
-	/// <inheritdoc/>
-	public override void Dispose()
-	{
-		base.Dispose();
-
-		UnloadAll();
-	}
-
-	/// <inheritdoc/>
-	public override void Initialize()
+	static Assemblies()
 	{
 		foreach (var loadedAssembly in Reflection.GameAssemblies)
 			OnAssemblyLoadAttribute.RunOnAssembly(loadedAssembly);
 	}
 
 	/// <summary> Loads an assembly from the specified path. </summary>
-	public BerylAssembly LoadFromPath(string path)
+	public static BerylAssembly LoadFromPath(string path)
 	{
 		string absolutePath = System.IO.Path.GetFullPath(path);
 
@@ -45,7 +31,7 @@ public class AssemblyModule : BaseModule
 	}
 
 	/// <summary> Unloads all currently loaded assemblies. </summary>
-	public void UnloadAll()
+	public static void UnloadAll()
 	{
 		foreach (var asm in Reflection.GameAssemblies)
 			asm.TryUnload();

@@ -10,7 +10,6 @@
     <ProjectReference Include="..\..\Beryl.Common\Beryl.Common.csproj" />
     <ProjectReference Include="..\..\Beryl.Math\Beryl.Math.csproj" />
     <ProjectReference Include="..\..\Beryl.Serialization\Beryl.Serialization.csproj" />
-    <ProjectReference Include="..\Beryl.Assemblies\Beryl.Assemblies.csproj" />
   </ItemGroup>
 
 </Project>

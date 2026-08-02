@@ -1,7 +1,6 @@
 // This file is part of the Beryl Game Engine.
 // Licensed under the MIT license. (https://github.com/Beryl-Engine/Beryl/blob/main/LICENSE)
 
-using Beryl.Assemblies;
 using Beryl.Audio;
 using Beryl.Common;
 using Beryl.GUI;
@@ -22,7 +21,6 @@ internal sealed class Program
 	{
 		// Register all Modules our game wants to use
 		ModuleManager.RegisterModule<InputModule>();
-		ModuleManager.RegisterModule<AssemblyModule>();
 		ModuleManager.RegisterModule<PhysicsModule>();
 		ModuleManager.RegisterModule<SceneModule>();
 		ModuleManager.RegisterModule<AudioModule>();

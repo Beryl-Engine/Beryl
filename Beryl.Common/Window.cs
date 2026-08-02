@@ -25,17 +25,24 @@ public class Window
 	public int FramesPerSecond => Time.Delta > 0 ? (int)(1 / Time.Delta) : 0;
 
 	/// <summary> The title of the window. </summary>
-	public string Title { get => InternalWindow.Title; set => InternalWindow.Title = value; }
+	public string Title
+	{
+		get => field;
+		set
+		{
+			field = value;
+			InternalWindow.Title = value;
+		}
+	} = "Window";
 
 	/// <summary> Initializes a new instance of the <see cref="Window"/> class. </summary>
 	public Window()
 	{
 		WindowOptions options = WindowOptions.Default with
 		{
-			API = GraphicsAPI.None
+			API = GraphicsAPI.None,
+			VSync = Application.Info.Graphics.VSync
 		};
-
-		options.VSync = false;
 
 		InternalWindow = Silk.NET.Windowing.Window.Create(options);
 	}

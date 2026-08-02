@@ -30,9 +30,7 @@ public class RenderingModule : BaseModule
 		Application.OnResize += (size) => OnResize((int)size.X, (int)size.Y);
 		Application.OnRender += Render;
 
-		RendererOptions options = new();
-
-		Renderer.Initialize(Application.Window.InternalWindow, RendererBackend.Vulkan, options);
+		Renderer.Initialize(Application.Window.InternalWindow, RendererBackend.Vulkan);
 		Application.Window.Title += $" - [{Renderer.Backend}]";
 	}
 
