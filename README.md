@@ -30,17 +30,22 @@ static void Main(string[] args)
 
     Application.OnStart += () =>
     {
-			// Setup a scene!
+			// Setup a Scene!
 			Skybox sky = new();
 
 			FlyController flyController = new();
 
-			DebugEntity floor = new();
+			Prop floor = new() { PhysicsMode = PropPhysicsMode.Static };
 			floor.Transform.Scale = new Vector3(10, 1, 10);
+			floor.Renderer.Mesh = Mesh.Plane;
 
-			StaticProp prop = new();
-			prop.Transform.Position = new Vector3(0, 1, 0);
-			prop.Mesh = Mesh.Cube;
+			floor.RigidBody.Colliders.Add(new BoxCollider(10, 0.01f, 10));
+
+			Prop cube = new() { PhysicsMode = PropPhysicsMode.Dynamic };
+			cube.Transform.Position = new Vector3(0, 10f, 0);
+			cube.Renderer.Mesh = Mesh.Cube;
+
+			cube.RigidBody.Colliders.Add(new BoxCollider(1, 1, 1));
 
 			ModuleManager.GetModule<SceneModule>()?.CurrentScene.StartAll();
     };
