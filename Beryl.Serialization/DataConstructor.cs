@@ -127,5 +127,5 @@ internal static class DataConstructor
 		}
 	}
 
-	private static bool IsNestedObject(Type type) => !type.IsPrimitive && type != typeof(string) && !type.IsEnum && type.GetProperties().Length > 0;
+	private static bool IsNestedObject(Type type) => !type.IsPrimitive && type != typeof(string) && !type.IsEnum && (type.GetProperties().Length > 0 || type.GetFields(BindingFlags.NonPublic | BindingFlags.Instance).Any(f => f.GetCustomAttribute<AlwaysSerializeAttribute>() != null));
 }

@@ -2,6 +2,7 @@
 // Licensed under the MIT license. (https://github.com/Beryl-Engine/Beryl/blob/main/LICENSE)
 
 using Beryl.Common.Resources.DefaultProvider;
+using Beryl.Serialization.Attributes;
 using System.Reflection;
 
 namespace Beryl.Common.Resources;
@@ -15,6 +16,7 @@ public class ProjectInfo
 	public string Name { get; init; } = Assembly.GetEntryAssembly()?.GetName().Name ?? "New Project";
 	
 	/// <summary> Information and settings for the application Window. </summary>
+	[AlwaysSerialize]
 	public WindowInfo Window { get; init; } = new WindowInfo();
 }
 

@@ -1,2 +1,5 @@
 # Project Settings
 Name: "Desktop Player"
+Window:
+    Width: 1280
+    Height: 720
