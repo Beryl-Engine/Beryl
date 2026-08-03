@@ -41,7 +41,8 @@ public class Window
 		WindowOptions options = WindowOptions.Default with
 		{
 			API = GraphicsAPI.None,
-			VSync = Application.Info.Graphics.VSync
+			VSync = Application.Info.Window.VSync,
+			Size = new(Application.Info.Window.Width, Application.Info.Window.Height)
 		};
 
 		InternalWindow = Silk.NET.Windowing.Window.Create(options);

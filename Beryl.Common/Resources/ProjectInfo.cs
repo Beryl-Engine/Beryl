@@ -14,13 +14,17 @@ public class ProjectInfo
 	/// <summary> The name of the project. </summary>
 	public string Name { get; init; } = Assembly.GetEntryAssembly()?.GetName().Name ?? "New Project";
 	
-	/// <summary> Information and settings for rendering/graphics. </summary>
-	public GraphicsInfo Graphics { get; init; } = default;
+	/// <summary> Information and settings for the application Window. </summary>
+	public WindowInfo Window { get; init; } = new WindowInfo();
 }
 
-public readonly struct GraphicsInfo
+public readonly struct WindowInfo
 {
+	public WindowInfo() {}
+
 	public bool VSync { get; init; }
+	public int Width { get; init; } = 1280;
+	public int Height { get; init; } = 720;
 }
 
 
