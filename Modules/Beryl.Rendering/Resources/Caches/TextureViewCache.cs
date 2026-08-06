@@ -3,10 +3,11 @@
 
 namespace Beryl.Rendering.Resources.Caches;
 
+using Beryl.Common;
 using Beryl.RHI.Resources;
 
 public sealed class TextureViewCache : ResourceCache<TextureViewCache, TextureViewDescriptor, ITextureView>
 {
 	/// <inheritdoc/>
-	protected override ITextureView Create(TextureViewDescriptor key) => RenderingModule.Device.ResourceFactory.CreateTextureView(key);
+	protected override ITextureView Create(TextureViewDescriptor key) => ModuleManager.GetModule<RenderingModule>()!.Device.ResourceFactory.CreateTextureView(key);
 }

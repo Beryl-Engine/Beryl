@@ -1,6 +1,7 @@
 // This file is part of the Beryl Game Engine.
 // Licensed under the MIT license. (https://github.com/Beryl-Engine/Beryl/blob/main/LICENSE)
 
+using Beryl.Common;
 using Beryl.RHI;
 using Beryl.RHI.Resources;
 
@@ -26,7 +27,7 @@ public abstract class RenderPass
 		Render(in frame, buffer.Object);
 
 		buffer.Object.End();
-		RenderingModule.SubmitCommandBuffer(buffer.Object);
+		ModuleManager.GetModule<RenderingModule>()?.SubmitCommandBuffer(buffer.Object);
 	}
 
 	/// <summary> Performs rendering operations. </summary>
@@ -34,5 +35,5 @@ public abstract class RenderPass
 	public abstract void Render(in RenderFrame frame, ICommandBuffer buffer);
 
 	/// <summary> The target <see cref="IFramebuffer"/> this pass is rendering to. </summary>
-	protected virtual IFramebuffer TargetBuffer => RenderingModule.Device.SwapchainFramebuffer;
+	protected virtual IFramebuffer TargetBuffer => ModuleManager.GetModule<RenderingModule>()!.Device.SwapchainFramebuffer;
 }

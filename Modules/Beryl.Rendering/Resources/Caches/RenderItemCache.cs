@@ -1,6 +1,7 @@
 // This file is part of the Beryl Game Engine.
 // Licensed under the MIT license. (https://github.com/Beryl-Engine/Beryl/blob/main/LICENSE)
 
+using Beryl.Common;
 using Beryl.Common.Standard;
 using Beryl.Math;
 
@@ -13,7 +14,7 @@ public sealed class RenderItemCache : ResourceCache<RenderItemCache, RenderItemK
 	/// <inheritdoc/>
 	protected override RenderItem Create(RenderItemKey key)
 	{
-		var factory = RenderingModule.Device.ResourceFactory;
+		var factory = ModuleManager.GetModule<RenderingModule>()!.Device.ResourceFactory;
 
 		int vertCount = key.VertexPositions.Length;
 		float[] vertexData = new float[vertCount * 8];
@@ -32,8 +33,8 @@ public sealed class RenderItemCache : ResourceCache<RenderItemCache, RenderItemK
 		IBuffer vb = factory.CreateBuffer(new BufferDescriptor((uint)vertexData.Length * sizeof(float), BufferUsage.VertexBuffer));
 		IBuffer ib = factory.CreateBuffer(new BufferDescriptor((uint)key.Indices.Length * sizeof(uint), BufferUsage.IndexBuffer));
 
-		RenderingModule.Device.UpdateBuffer(vb, 0, vertexData);
-		RenderingModule.Device.UpdateBuffer(ib, 0, key.Indices);
+		ModuleManager.GetModule<RenderingModule>()!.Device.UpdateBuffer(vb, 0, vertexData);
+		ModuleManager.GetModule<RenderingModule>()!.Device.UpdateBuffer(ib, 0, key.Indices);
 
 		FrameCountedResource<IPipeline> pipeline = PipelineCache.Instance.GetOrCreate(key.Pipeline);
 

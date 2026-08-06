@@ -1,6 +1,7 @@
 // This file is part of the Beryl Game Engine.
 // Licensed under the MIT license. (https://github.com/Beryl-Engine/Beryl/blob/main/LICENSE)
 
+using Beryl.Common;
 using SlangShaderSharp;
 
 namespace Beryl.Rendering;
@@ -10,19 +11,22 @@ namespace Beryl.Rendering;
 /// </summary>
 public static class ShaderBaker
 {
+	/// <summary> The <see cref="RHI.RendererBackend"/> in use. </summary>
+	private static RHI.RendererBackend Backend => ModuleManager.GetModule<RenderingModule>()?.Backend ?? RHI.RendererBackend.Vulkan;
+
 	/// <summary> The <see cref="SlangCompileTarget"/> for the current rendering backend. </summary>
 	public static SlangCompileTarget SlangTarget
 	{
 		get
 		{
-			switch (RenderingModule.Backend)
+			switch (Backend)
 			{
 				case RHI.RendererBackend.Vulkan:
 					return SlangCompileTarget.Spirv;
 				case RHI.RendererBackend.Direct3D12:
 					return SlangCompileTarget.Dxil;
 				default:
-					throw new NotImplementedException($"Can't compile Slang for target {RenderingModule.Backend}.");
+					throw new NotImplementedException($"Can't compile Slang for target {Backend}.");
 			}
 		}
 	}
@@ -32,14 +36,14 @@ public static class ShaderBaker
 	{
 		get
 		{
-			switch (RenderingModule.Backend)
+			switch (Backend)
 			{
 				case RHI.RendererBackend.Vulkan:
 					return globalSession.FindProfile("spirv_1_3");
 				case RHI.RendererBackend.Direct3D12:
 					return globalSession.FindProfile("sm_6_0");
 				default:
-					throw new NotImplementedException($"Can't compile Slang for target {RenderingModule.Backend}.");
+					throw new NotImplementedException($"Can't compile Slang for target {Backend}.");
 			}
 		}
 	}

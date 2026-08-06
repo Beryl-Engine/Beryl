@@ -4,6 +4,7 @@
 using Beryl.Common;
 using Beryl.Input;
 using Beryl.Rendering;
+using Beryl.RHI;
 using Beryl.VirtualReality.OpenXR.Bindings;
 
 using Silk.NET.OpenXR;
@@ -34,7 +35,7 @@ internal sealed class OpenXRDevice : VirtualRealityDevice
 	public override void Initialize()
 	{
 		OpenXR = XR.GetApi();
-		GraphicsBinding = new OpenXRGraphicsBinding(OpenXR, RenderingModule.Backend);
+		GraphicsBinding = new OpenXRGraphicsBinding(OpenXR, ModuleManager.GetModule<RenderingModule>()?.Backend ?? RendererBackend.Vulkan);
 		Instance = new OpenXRInstance(OpenXR);
 		Session = new OpenXRSession(OpenXR, GraphicsBinding, Instance);
 

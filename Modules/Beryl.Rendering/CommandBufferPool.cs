@@ -3,11 +3,12 @@
 
 namespace Beryl.Rendering;
 
+using Beryl.Common;
 using Beryl.Common.Datatypes;
 using Beryl.RHI;
 
 public class CommandBufferPool : ObjectPool<CommandBufferPool, ICommandBuffer>
 {
 	/// <inheritdoc/>
-	protected override ICommandBuffer CreateObject() => RenderingModule.Device.ResourceFactory.CreateCommandBuffer();
+	protected override ICommandBuffer CreateObject() => ModuleManager.GetModule<RenderingModule>()!.Device.ResourceFactory.CreateCommandBuffer();
 }

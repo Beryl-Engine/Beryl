@@ -27,13 +27,13 @@ public class RenderingModule : BaseModule
 	public RenderPipeline Pipeline { get; set; } = new ForwardRenderPipeline();
 
 	/// <summary> The renderer backend in use. </summary>
-	public static RendererBackend Backend { get; private set; }
+	public RendererBackend Backend { get; private set; }
 
 	/// <summary> The lower-level <see cref="IGraphicsDevice"/>. </summary>
-	public static IGraphicsDevice Device { get; private set; } = null!;
+	public IGraphicsDevice Device { get; private set; } = null!;
 
 	/// <summary> Incremented every rendered frame. </summary>
-	public static ulong CurrentFrame { get; private set; }
+	public ulong CurrentFrame { get; private set; }
 
 	/// <inheritdoc/>
 	public override void Initialize()
@@ -70,7 +70,7 @@ public class RenderingModule : BaseModule
 	}
 
 	/// <summary> Presents the current frame. </summary>
-	public static void Present()
+	public void Present()
 	{
 		Device.SwapBuffers();
 		CurrentFrame++;
@@ -97,15 +97,15 @@ public class RenderingModule : BaseModule
 	public void OnResize(int width, int height) => Resize((uint)width, (uint)height);
 
 	/// <summary> Resizes the renderer. </summary>
-	public static void Resize(uint width, uint height) => Device.ResizeSwapchain(width, height);
+	public void Resize(uint width, uint height) => Device.ResizeSwapchain(width, height);
 
 	/// <summary> Submits the given <see cref="ICommandBuffer"/> to be ran. </summary>
-	public static void SubmitCommandBuffer(ICommandBuffer commandBuffer) => Device.SubmitCommands(commandBuffer);
+	public void SubmitCommandBuffer(ICommandBuffer commandBuffer) => Device.SubmitCommands(commandBuffer);
 
 	/// <summary> Initializes the desired backend. Should be called once after window loading. </summary>
 	/// <param name="window"> The window to initialize the backend for. </param>
 	/// <param name="backend"> The backend to initialize. </param>
-	private static void InitializeDevice(IWindow window, RendererBackend? backend = null)
+	private void InitializeDevice(IWindow window, RendererBackend? backend = null)
 	{
 		if (backend is null)
 		{
@@ -123,7 +123,7 @@ public class RenderingModule : BaseModule
 	}
 
 	/// <summary> Cleans up the renderer. </summary>
-	private static void DisposeDevice()
+	private void DisposeDevice()
 	{
 		FrameDisposalQueue.DisposeResources(ulong.MaxValue);
 		Device.Dispose();

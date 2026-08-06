@@ -1,6 +1,7 @@
 // This file is part of the Beryl Game Engine.
 // Licensed under the MIT license. (https://github.com/Beryl-Engine/Beryl/blob/main/LICENSE)
 
+using Beryl.Common;
 using Beryl.Math;
 using Beryl.Rendering.Components;
 using Beryl.Rendering.Resources;
@@ -25,7 +26,7 @@ public interface IShaderDefaultsProvider
 
 public class ShaderDefaultsProvider : IShaderDefaultsProvider
 {
-	public static Matrix4x4 ClipCorrectionMatrix => (RenderingModule.Device.Features & DeviceFeatures.ClipSpaceYInverted) != 0 ? Matrix4x4.CreateScale(1, -1, 1) : Matrix4x4.Identity;
+	private Matrix4x4 ClipCorrectionMatrix => (ModuleManager.GetModule<RenderingModule>()!.Device.Features & DeviceFeatures.ClipSpaceYInverted) != 0 ? Matrix4x4.CreateScale(1, -1, 1) : Matrix4x4.Identity;
 
 	/// <inheritdoc/>
 	public ReadOnlySpan<byte> GetCameraBuffer(Camera camera)

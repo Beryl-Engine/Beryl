@@ -1,6 +1,7 @@
 // This file is part of the Beryl Game Engine.
 // Licensed under the MIT license. (https://github.com/Beryl-Engine/Beryl/blob/main/LICENSE)
 
+using Beryl.Common;
 using Beryl.Common.Utility;
 
 namespace Beryl.Rendering.Resources;
@@ -71,5 +72,5 @@ public class FrameCountedResource<T> : IFrameCountedResource where T : IDisposab
 	public void ReleaseGPUResource() => Resource.Dispose();
 
 	/// <inheritdoc/>
-	public void Touch() => LastUsedFrame = RenderingModule.CurrentFrame;
+	public void Touch() => LastUsedFrame = ModuleManager.GetModule<RenderingModule>()?.CurrentFrame;
 }

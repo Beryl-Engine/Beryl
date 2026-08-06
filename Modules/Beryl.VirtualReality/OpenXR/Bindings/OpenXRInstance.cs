@@ -3,6 +3,7 @@
 
 using System.Runtime.InteropServices;
 
+using Beryl.Common;
 using Beryl.Common.Utility;
 using Beryl.Rendering;
 using Beryl.RHI;
@@ -57,6 +58,9 @@ internal sealed class OpenXRInstance : OpenXRBinding
 		}
 	}
 
+	/// <summary> The <see cref="RendererBackend"/> in use. </summary>
+	private RendererBackend Backend => ModuleManager.GetModule<RenderingModule>()?.Backend ?? RendererBackend.Vulkan;
+
 	private readonly List<string> extensions = new();
 
 	public OpenXRInstance(XR openXR) : base(openXR)
@@ -108,7 +112,7 @@ internal sealed class OpenXRInstance : OpenXRBinding
 	{
 		List<string> extensions = new();
 
-		string requiredExtension = RenderingModule.Backend switch
+		string requiredExtension = Backend switch
 		{
 			RendererBackend.Vulkan => "XR_KHR_vulkan_enable",
 			RendererBackend.Direct3D12 => "XR_KHR_D3D12_enable",
@@ -155,7 +159,7 @@ internal sealed class OpenXRInstance : OpenXRBinding
 	// This needs to run for a valid instance
 	private unsafe void CheckGraphicsRequirements()
 	{
-		switch (RenderingModule.Backend)
+		switch (Backend)
 		{
 			case RendererBackend.Direct3D12:
 				{

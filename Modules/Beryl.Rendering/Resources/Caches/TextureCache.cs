@@ -3,10 +3,11 @@
 
 namespace Beryl.Rendering.Resources.Caches;
 
+using Beryl.Common;
 using Beryl.RHI.Resources;
 
 public sealed class TextureCache : ResourceCache<TextureCache, TextureDescriptor, ITexture>
 {
 	/// <inheritdoc/>
-	protected override ITexture Create(TextureDescriptor key) => RenderingModule.Device.ResourceFactory.CreateTexture(key);
+	protected override ITexture Create(TextureDescriptor key) => ModuleManager.GetModule<RenderingModule>()!.Device.ResourceFactory.CreateTexture(key);
 }
