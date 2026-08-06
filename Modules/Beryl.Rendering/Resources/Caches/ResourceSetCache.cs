@@ -8,5 +8,5 @@ namespace Beryl.Rendering.Resources.Caches;
 public sealed class ResourceSetCache : ResourceCache<ResourceSetCache, ResourceDescriptor, IResourceSet>
 {
 	/// <inheritdoc/>
-	protected override IResourceSet Create(ResourceDescriptor key) => Renderer.Device.ResourceFactory.CreateResourceSet(key);
+	protected override IResourceSet Create(ResourceDescriptor key) => RenderingModule.Device.ResourceFactory.CreateResourceSet(key);
 }

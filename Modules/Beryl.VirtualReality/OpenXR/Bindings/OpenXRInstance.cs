@@ -108,7 +108,7 @@ internal sealed class OpenXRInstance : OpenXRBinding
 	{
 		List<string> extensions = new();
 
-		string requiredExtension = Renderer.Backend switch
+		string requiredExtension = RenderingModule.Backend switch
 		{
 			RendererBackend.Vulkan => "XR_KHR_vulkan_enable",
 			RendererBackend.Direct3D12 => "XR_KHR_D3D12_enable",
@@ -155,7 +155,7 @@ internal sealed class OpenXRInstance : OpenXRBinding
 	// This needs to run for a valid instance
 	private unsafe void CheckGraphicsRequirements()
 	{
-		switch (Renderer.Backend)
+		switch (RenderingModule.Backend)
 		{
 			case RendererBackend.Direct3D12:
 				{

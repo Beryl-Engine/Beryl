@@ -11,6 +11,8 @@ using Beryl.Rendering.Pipelines;
 using Beryl.Rendering.Pipelines.Forward;
 using Beryl.Rendering.Resources;
 
+using Silk.NET.Windowing;
+
 namespace Beryl.Rendering;
 
 /// <summary>
@@ -24,14 +26,23 @@ public class RenderingModule : BaseModule
 	/// <summary> The <see cref="RenderPipeline"/> in use. </summary>
 	public RenderPipeline Pipeline { get; set; } = new ForwardRenderPipeline();
 
+	/// <summary> The renderer backend in use. </summary>
+	public static RendererBackend Backend { get; private set; }
+
+	/// <summary> The lower-level <see cref="IGraphicsDevice"/>. </summary>
+	public static IGraphicsDevice Device { get; private set; } = null!;
+
+	/// <summary> Incremented every rendered frame. </summary>
+	public static ulong CurrentFrame { get; private set; }
+
 	/// <inheritdoc/>
 	public override void Initialize()
 	{
 		Application.OnResize += (size) => OnResize((int)size.X, (int)size.Y);
 		Application.OnRender += Render;
 
-		Renderer.Initialize(Application.Window.InternalWindow, RendererBackend.Vulkan);
-		Application.Window.Title += $" - [{Renderer.Backend}]";
+		InitializeDevice(Application.Window.InternalWindow, RendererBackend.Vulkan);
+		Application.Window.Title += $" - [{Backend}]";
 	}
 
 	public void Render()
@@ -55,7 +66,16 @@ public class RenderingModule : BaseModule
 		Pipeline.Render(in frame);
 		Renderables.Clear();
 
-		Renderer.Present();
+		Present();
+	}
+
+	/// <summary> Presents the current frame. </summary>
+	public static void Present()
+	{
+		Device.SwapBuffers();
+		CurrentFrame++;
+
+		FrameDisposalQueue.DisposeResources(CurrentFrame);
 	}
 
 	/// <inheritdoc/>
@@ -63,7 +83,7 @@ public class RenderingModule : BaseModule
 	{
 		base.Dispose();
 
-		Renderer.Dispose();
+		DisposeDevice();
 
 		Application.OnResize -= (size) => OnResize((int)size.X, (int)size.Y);
 		Application.OnRender -= Render;
@@ -74,5 +94,38 @@ public class RenderingModule : BaseModule
 	/// <param name="transform">The object's transform matrix.</param>
 	public void QueueObject(IClientRenderable renderable, Matrix4x4 transform) => Renderables.Add((renderable, transform));
 
-	public void OnResize(int width, int height) => Renderer.Resize((uint)width, (uint)height);
+	public void OnResize(int width, int height) => Resize((uint)width, (uint)height);
+
+	/// <summary> Resizes the renderer. </summary>
+	public static void Resize(uint width, uint height) => Device.ResizeSwapchain(width, height);
+
+	/// <summary> Submits the given <see cref="ICommandBuffer"/> to be ran. </summary>
+	public static void SubmitCommandBuffer(ICommandBuffer commandBuffer) => Device.SubmitCommands(commandBuffer);
+
+	/// <summary> Initializes the desired backend. Should be called once after window loading. </summary>
+	/// <param name="window"> The window to initialize the backend for. </param>
+	/// <param name="backend"> The backend to initialize. </param>
+	private static void InitializeDevice(IWindow window, RendererBackend? backend = null)
+	{
+		if (backend is null)
+		{
+			backend = GraphicsDeviceFactory.IsBackendSupported(RendererBackend.Vulkan)
+				? RendererBackend.Vulkan
+				: GraphicsDeviceFactory.IsBackendSupported(RendererBackend.Direct3D12)
+					? RendererBackend.Direct3D12
+					: throw new InvalidOperationException("No supported graphics backend found.");
+		}
+
+		Backend = backend.Value;
+
+		Device = GraphicsDeviceFactory.Create(Backend);
+		Device.Initialize(window);
+	}
+
+	/// <summary> Cleans up the renderer. </summary>
+	private static void DisposeDevice()
+	{
+		FrameDisposalQueue.DisposeResources(ulong.MaxValue);
+		Device.Dispose();
+	}
 }

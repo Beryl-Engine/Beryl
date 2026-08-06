@@ -9,5 +9,5 @@ namespace Beryl.Rendering.Resources.Caches;
 public sealed class SamplerCache : ResourceCache<SamplerCache, SamplerDescriptor, ISampler>
 {
 	/// <inheritdoc/>
-	protected override ISampler Create(SamplerDescriptor key) => Renderer.Device.ResourceFactory.CreateSampler(key);
+	protected override ISampler Create(SamplerDescriptor key) => RenderingModule.Device.ResourceFactory.CreateSampler(key);
 }

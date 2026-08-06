@@ -26,7 +26,7 @@ public abstract class RenderPass
 		Render(in frame, buffer.Object);
 
 		buffer.Object.End();
-		Renderer.SubmitCommandBuffer(buffer.Object);
+		RenderingModule.SubmitCommandBuffer(buffer.Object);
 	}
 
 	/// <summary> Performs rendering operations. </summary>
@@ -34,5 +34,5 @@ public abstract class RenderPass
 	public abstract void Render(in RenderFrame frame, ICommandBuffer buffer);
 
 	/// <summary> The target <see cref="IFramebuffer"/> this pass is rendering to. </summary>
-	protected virtual IFramebuffer TargetBuffer => Renderer.Device.SwapchainFramebuffer;
+	protected virtual IFramebuffer TargetBuffer => RenderingModule.Device.SwapchainFramebuffer;
 }

@@ -15,14 +15,14 @@ public static class ShaderBaker
 	{
 		get
 		{
-			switch (Renderer.Backend)
+			switch (RenderingModule.Backend)
 			{
 				case RHI.RendererBackend.Vulkan:
 					return SlangCompileTarget.Spirv;
 				case RHI.RendererBackend.Direct3D12:
 					return SlangCompileTarget.Dxil;
 				default:
-					throw new NotImplementedException($"Can't compile Slang for target {Renderer.Backend}.");
+					throw new NotImplementedException($"Can't compile Slang for target {RenderingModule.Backend}.");
 			}
 		}
 	}
@@ -32,14 +32,14 @@ public static class ShaderBaker
 	{
 		get
 		{
-			switch (Renderer.Backend)
+			switch (RenderingModule.Backend)
 			{
 				case RHI.RendererBackend.Vulkan:
 					return globalSession.FindProfile("spirv_1_3");
 				case RHI.RendererBackend.Direct3D12:
 					return globalSession.FindProfile("sm_6_0");
 				default:
-					throw new NotImplementedException($"Can't compile Slang for target {Renderer.Backend}.");
+					throw new NotImplementedException($"Can't compile Slang for target {RenderingModule.Backend}.");
 			}
 		}
 	}

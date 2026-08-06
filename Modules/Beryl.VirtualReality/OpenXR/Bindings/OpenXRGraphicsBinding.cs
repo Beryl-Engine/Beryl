@@ -28,18 +28,18 @@ internal sealed class OpenXRGraphicsBinding : OpenXRBinding
 			switch (target)
 			{
 				case RendererBackend.Vulkan:
-					if (Renderer.Device.VulkanInfo == null)
+					if (RenderingModule.Device.VulkanInfo == null)
 						throw new Exception();
 
 					vulkanBinding = new GraphicsBindingVulkanKHR
 					{
 						Type = StructureType.GraphicsBindingVulkanKhr,
 
-						Instance = new VkHandle(Renderer.Device.VulkanInfo.Value.Instance),
-						PhysicalDevice = new VkHandle(Renderer.Device.VulkanInfo.Value.PhysicalDevice),
-						Device = new VkHandle(Renderer.Device.VulkanInfo.Value.Device),
+						Instance = new VkHandle(RenderingModule.Device.VulkanInfo.Value.Instance),
+						PhysicalDevice = new VkHandle(RenderingModule.Device.VulkanInfo.Value.PhysicalDevice),
+						Device = new VkHandle(RenderingModule.Device.VulkanInfo.Value.Device),
 
-						QueueFamilyIndex = Renderer.Device.VulkanInfo.Value.GraphicsQueueFamilyIndex,
+						QueueFamilyIndex = RenderingModule.Device.VulkanInfo.Value.GraphicsQueueFamilyIndex,
 						QueueIndex = 0
 					};
 					Native = (IntPtr)Unsafe.AsPointer(ref vulkanBinding);
@@ -49,7 +49,7 @@ internal sealed class OpenXRGraphicsBinding : OpenXRBinding
 					d3d12Binding = new GraphicsBindingD3D12KHR()
 					{
 						Type = StructureType.GraphicsBindingD3D12Khr,
-						// Device = (void*)Renderer.Device.GraphicsDevice.GetD3D12Info().Device,
+						// Device = (void*)RenderingModule.Device.GraphicsDevice.GetD3D12Info().Device,
 					};
 					Native = (IntPtr)Unsafe.AsPointer(ref d3d12Binding);
 					break;

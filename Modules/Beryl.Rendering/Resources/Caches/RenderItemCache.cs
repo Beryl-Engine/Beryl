@@ -13,7 +13,7 @@ public sealed class RenderItemCache : ResourceCache<RenderItemCache, RenderItemK
 	/// <inheritdoc/>
 	protected override RenderItem Create(RenderItemKey key)
 	{
-		var factory = Renderer.Device.ResourceFactory;
+		var factory = RenderingModule.Device.ResourceFactory;
 
 		int vertCount = key.VertexPositions.Length;
 		float[] vertexData = new float[vertCount * 8];
@@ -32,8 +32,8 @@ public sealed class RenderItemCache : ResourceCache<RenderItemCache, RenderItemK
 		IBuffer vb = factory.CreateBuffer(new BufferDescriptor((uint)vertexData.Length * sizeof(float), BufferUsage.VertexBuffer));
 		IBuffer ib = factory.CreateBuffer(new BufferDescriptor((uint)key.Indices.Length * sizeof(uint), BufferUsage.IndexBuffer));
 
-		Renderer.Device.UpdateBuffer(vb, 0, vertexData);
-		Renderer.Device.UpdateBuffer(ib, 0, key.Indices);
+		RenderingModule.Device.UpdateBuffer(vb, 0, vertexData);
+		RenderingModule.Device.UpdateBuffer(ib, 0, key.Indices);
 
 		FrameCountedResource<IPipeline> pipeline = PipelineCache.Instance.GetOrCreate(key.Pipeline);
 

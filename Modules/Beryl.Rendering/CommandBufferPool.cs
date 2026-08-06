@@ -9,5 +9,5 @@ using Beryl.RHI;
 public class CommandBufferPool : ObjectPool<CommandBufferPool, ICommandBuffer>
 {
 	/// <inheritdoc/>
-	protected override ICommandBuffer CreateObject() => Renderer.Device.ResourceFactory.CreateCommandBuffer();
+	protected override ICommandBuffer CreateObject() => RenderingModule.Device.ResourceFactory.CreateCommandBuffer();
 }

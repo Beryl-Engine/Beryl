@@ -25,7 +25,7 @@ public interface IShaderDefaultsProvider
 
 public class ShaderDefaultsProvider : IShaderDefaultsProvider
 {
-	public static Matrix4x4 ClipCorrectionMatrix => (Renderer.Device.Features & DeviceFeatures.ClipSpaceYInverted) != 0 ? Matrix4x4.CreateScale(1, -1, 1) : Matrix4x4.Identity;
+	public static Matrix4x4 ClipCorrectionMatrix => (RenderingModule.Device.Features & DeviceFeatures.ClipSpaceYInverted) != 0 ? Matrix4x4.CreateScale(1, -1, 1) : Matrix4x4.Identity;
 
 	/// <inheritdoc/>
 	public ReadOnlySpan<byte> GetCameraBuffer(Camera camera)

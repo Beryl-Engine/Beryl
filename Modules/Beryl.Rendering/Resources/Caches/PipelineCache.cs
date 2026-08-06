@@ -11,5 +11,5 @@ namespace Beryl.Rendering.Resources.Caches;
 public sealed class PipelineCache : ResourceCache<PipelineCache, PipelineDescriptor, IPipeline>
 {
 	/// <inheritdoc/>
-	protected override IPipeline Create(PipelineDescriptor key) => Renderer.Device.ResourceFactory.CreateGraphicsPipeline(key);
+	protected override IPipeline Create(PipelineDescriptor key) => RenderingModule.Device.ResourceFactory.CreateGraphicsPipeline(key);
 }

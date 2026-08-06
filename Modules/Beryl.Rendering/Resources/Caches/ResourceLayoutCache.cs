@@ -8,5 +8,5 @@ namespace Beryl.Rendering.Resources.Caches;
 public sealed class ResourceLayoutCache : ResourceCache<ResourceLayoutCache, ResourceLayoutDescriptor, IResourceLayout>
 {
 	/// <inheritdoc/>
-	protected override IResourceLayout Create(ResourceLayoutDescriptor key) => Renderer.Device.ResourceFactory.CreateResourceLayout(key);
+	protected override IResourceLayout Create(ResourceLayoutDescriptor key) => RenderingModule.Device.ResourceFactory.CreateResourceLayout(key);
 }

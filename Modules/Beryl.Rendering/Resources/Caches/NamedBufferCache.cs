@@ -9,5 +9,5 @@ namespace Beryl.Rendering.Resources.Caches;
 public sealed class NamedBufferCache : ResourceCache<NamedBufferCache, NamedBufferDescriptor, IBuffer>
 {
 	/// <inheritdoc/>
-	protected override IBuffer Create(NamedBufferDescriptor key) => Renderer.Device.ResourceFactory.CreateBuffer(new BufferDescriptor(key.Size, key.Usage));
+	protected override IBuffer Create(NamedBufferDescriptor key) => RenderingModule.Device.ResourceFactory.CreateBuffer(new BufferDescriptor(key.Size, key.Usage));
 }

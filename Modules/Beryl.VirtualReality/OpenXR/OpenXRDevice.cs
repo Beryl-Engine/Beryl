@@ -34,7 +34,7 @@ internal sealed class OpenXRDevice : VirtualRealityDevice
 	public override void Initialize()
 	{
 		OpenXR = XR.GetApi();
-		GraphicsBinding = new OpenXRGraphicsBinding(OpenXR, Renderer.Backend);
+		GraphicsBinding = new OpenXRGraphicsBinding(OpenXR, RenderingModule.Backend);
 		Instance = new OpenXRInstance(OpenXR);
 		Session = new OpenXRSession(OpenXR, GraphicsBinding, Instance);
 

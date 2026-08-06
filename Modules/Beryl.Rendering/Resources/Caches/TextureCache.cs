@@ -8,5 +8,5 @@ using Beryl.RHI.Resources;
 public sealed class TextureCache : ResourceCache<TextureCache, TextureDescriptor, ITexture>
 {
 	/// <inheritdoc/>
-	protected override ITexture Create(TextureDescriptor key) => Renderer.Device.ResourceFactory.CreateTexture(key);
+	protected override ITexture Create(TextureDescriptor key) => RenderingModule.Device.ResourceFactory.CreateTexture(key);
 }
