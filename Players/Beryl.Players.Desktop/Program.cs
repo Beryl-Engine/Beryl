@@ -29,9 +29,9 @@ internal sealed class Program
 
 		Application.OnStart += () =>
 		{
+			// Setup a Scene!
 			Skybox sky = new();
 
-			// Setup debug scene
 			FlyController flyController = new();
 
 			Prop floor = new() { PhysicsMode = PropPhysicsMode.Static };

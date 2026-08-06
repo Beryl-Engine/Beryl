@@ -50,4 +50,9 @@ public struct SampledTexture2D<T> where T : ITexelElement
 {
     public Texture2D<T> Texture;
     public SamplerState Sampler;
+
+    public T Sample(float2 uv)
+    {
+        return Texture.Sample(Sampler, uv);
+    }
 };
