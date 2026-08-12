@@ -31,8 +31,8 @@ public class Shader
 		set
 		{
 			SlangCompilationResult comp = ShaderBaker.SlangToSpirV(value, Name);
-			VertexBytecode = comp.VertexBytes.ToArray();
-			FragmentBytecode = comp.FragmentBytes.ToArray();
+			VertexBytecode = comp.Stages[SlangStage.Vertex];
+			FragmentBytecode = comp.Stages[SlangStage.Fragment];
 
 			foreach (var attribute in comp.ShaderAttributes)
 			{
