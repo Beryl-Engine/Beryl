@@ -48,8 +48,8 @@ public static class CommandBufferExtensions
 
 			var pipelineKey = new PipelineDescriptor(
 				passName: material.Shader.Pass,
-				vertShader: new ShaderDescriptor(material.Shader.VertexBytecode, ShaderStages.Vertex),
-				fragShader: new ShaderDescriptor(material.Shader.FragmentBytecode, ShaderStages.Fragment),
+				vertShader: new ShaderDescriptor(material.Shader.StageBytecode[ShaderStages.Vertex], ShaderStages.Vertex),
+				fragShader: new ShaderDescriptor(material.Shader.StageBytecode[ShaderStages.Fragment], ShaderStages.Fragment),
 				output: cmd.CurrentFramebuffer,
 				resourceGroups: material.Shader.ResourceGroups.AsSpan(),
 				cullingMode: material.Shader.CullingMode,

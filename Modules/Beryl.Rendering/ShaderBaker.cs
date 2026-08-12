@@ -11,22 +11,19 @@ namespace Beryl.Rendering;
 /// </summary>
 public static class ShaderBaker
 {
-	/// <summary> The <see cref="RHI.RendererBackend"/> in use. </summary>
-	private static RHI.RendererBackend Backend => ModuleManager.GetModule<RenderingModule>()?.Backend ?? RHI.RendererBackend.Vulkan;
-
 	/// <summary> The <see cref="SlangCompileTarget"/> for the current rendering backend. </summary>
 	public static SlangCompileTarget SlangTarget
 	{
 		get
 		{
-			switch (Backend)
+			switch (backend)
 			{
 				case RHI.RendererBackend.Vulkan:
 					return SlangCompileTarget.Spirv;
 				case RHI.RendererBackend.Direct3D12:
 					return SlangCompileTarget.Dxil;
 				default:
-					throw new NotImplementedException($"Can't compile Slang for target {Backend}.");
+					throw new NotImplementedException($"Can't compile Slang for target {backend}.");
 			}
 		}
 	}
@@ -36,17 +33,19 @@ public static class ShaderBaker
 	{
 		get
 		{
-			switch (Backend)
+			switch (backend)
 			{
 				case RHI.RendererBackend.Vulkan:
 					return globalSession.FindProfile("spirv_1_3");
 				case RHI.RendererBackend.Direct3D12:
 					return globalSession.FindProfile("sm_6_0");
 				default:
-					throw new NotImplementedException($"Can't compile Slang for target {Backend}.");
+					throw new NotImplementedException($"Can't compile Slang for target {backend}.");
 			}
 		}
 	}
+
+	private static RHI.RendererBackend backend => ModuleManager.GetModule<RenderingModule>()?.Backend ?? RHI.RendererBackend.Vulkan;
 
 	private static readonly IGlobalSession globalSession;
 	private static readonly ISession localSession;
@@ -90,31 +89,17 @@ public static class ShaderBaker
 		if (module == null)
 			throw new Exception($"Failed to compile shader: {diagnostics?.AsString}");
 
-		IEntryPoint? vertexEntry = null;
-		IEntryPoint? fragmentEntry = null;
-
-		var entryPoints = GetEntryPoints(module);
-		vertexEntry = entryPoints.FirstOrDefault(x => x.Stage == SlangStage.Vertex).EntryPoint;
-		fragmentEntry = entryPoints.FirstOrDefault(x => x.Stage == SlangStage.Fragment).EntryPoint;
-
-		List<AttributeReflection> attributes = GetAttributes(module);
-		List<VariableReflection> parameters = GetParameters(module);
-
-		ReadOnlySpan<byte> vert = Span<byte>.Empty;
-		ReadOnlySpan<byte> frag = Span<byte>.Empty;
-
+		ReadOnlySpan<AttributeReflection> attributes = GetAttributes(module);
+		ReadOnlySpan<VariableReflection> parameters = GetParameters(module);
 		List<VariableLayoutReflection> resources = new();
 
-		if (vertexEntry == null && fragmentEntry == null)
-			return new SlangCompilationResult() { ShaderAttributes = attributes, ShaderParameters = parameters, Resources = resources };
+		List<(IEntryPoint EntryPoint, SlangStage Stage)> entryPoints = GetEntryPoints(module).ToList();
+
+		if (entryPoints.Count == 0)
+			return new SlangCompilationResult { ShaderAttributes = attributes, ShaderParameters = parameters, Resources = resources.ToArray() };
 
 		List<IComponentType> components = [module];
-
-		if (vertexEntry != null)
-			components.Add(vertexEntry);
-
-		if (fragmentEntry != null)
-			components.Add(fragmentEntry);
+		components.AddRange(entryPoints.Select(e => (IComponentType)e.EntryPoint));
 
 		localSession.CreateCompositeComponentType(components.ToArray(), out IComponentType program, out _);
 		program.Link(out IComponentType linkedProgram, out _);
@@ -129,25 +114,29 @@ public static class ShaderBaker
 				resources.Add(variable);
 		}
 
-		if (vertexEntry != null)
-		{
-			linkedProgram.GetEntryPointCode(0, 0, out ISlangBlob vertBlob, out _);
-			int vertBufferSize = (int)vertBlob.GetBufferSize();
+		Dictionary<SlangStage, byte[]> stages = new();
 
+		for (int i = 0; i < entryPoints.Count; i++)
+		{
+			linkedProgram.GetEntryPointCode(i, 0, out ISlangBlob blob, out _);
+			int size = (int)blob.GetBufferSize();
+
+			byte[] bytes = new byte[size];
 			unsafe
-			{ vert = new ReadOnlySpan<byte>(vertBlob.GetBufferPointer(), vertBufferSize); }
+			{
+				new ReadOnlySpan<byte>(blob.GetBufferPointer(), size).CopyTo(bytes);
+			}
+
+			stages[entryPoints[i].Stage] = bytes;
 		}
 
-		if (fragmentEntry != null)
+		return new SlangCompilationResult
 		{
-			linkedProgram.GetEntryPointCode(1, 0, out ISlangBlob fragBlob, out _);
-			int fragBufferSize = (int)fragBlob.GetBufferSize();
-
-			unsafe
-			{ frag = new ReadOnlySpan<byte>(fragBlob.GetBufferPointer(), fragBufferSize); }
-		}
-
-		return new SlangCompilationResult() { FragmentBytes = frag, VertexBytes = vert, ShaderAttributes = attributes, ShaderParameters = parameters, Resources = resources };
+			Stages = stages,
+			ShaderAttributes = attributes,
+			ShaderParameters = parameters,
+			Resources = resources.ToArray()
+		};
 	}
 
 	private static IEnumerable<(IEntryPoint EntryPoint, SlangStage Stage)> GetEntryPoints(IModule module)
@@ -160,7 +149,7 @@ public static class ShaderBaker
 		}
 	}
 
-	private static List<AttributeReflection> GetAttributes(IModule module)
+	private static ReadOnlySpan<AttributeReflection> GetAttributes(IModule module)
 	{
 		List<AttributeReflection> attributes = new();
 
@@ -177,10 +166,10 @@ public static class ShaderBaker
 			}
 		}
 
-		return attributes;
+		return attributes.ToArray();
 	}
 
-	private static List<VariableReflection> GetParameters(IModule module)
+	private static ReadOnlySpan<VariableReflection> GetParameters(IModule module)
 	{
 		List<VariableReflection> parameters = new();
 
@@ -197,7 +186,7 @@ public static class ShaderBaker
 			}
 		}
 
-		return parameters;
+		return parameters.ToArray();
 	}
 }
 
@@ -206,11 +195,8 @@ public static class ShaderBaker
 /// </summary>
 public readonly ref struct SlangCompilationResult
 {
-	/// <summary> SPIRV Vertex bytes. </summary>
-	public ReadOnlySpan<byte> VertexBytes { get; init; }
-
-	/// <summary> SPIRV Fragment bytes. </summary>
-	public ReadOnlySpan<byte> FragmentBytes { get; init; }
+	/// <summary> All shader stages present in the compilation. </summary>
+	public IReadOnlyDictionary<SlangStage, byte[]> Stages { get; init; }
 
 	/// <summary> All attributes inside of a <c>SHADER_ATTRIBUTES()</c> block. </summary>
 	/// <example>
@@ -221,11 +207,11 @@ public readonly ref struct SlangCompilationResult
 	/// )
 	/// </code>
 	/// </example>
-	public List<AttributeReflection> ShaderAttributes { get; init; }
+	public ReadOnlySpan<AttributeReflection> ShaderAttributes { get; init; }
 
 	/// <summary> All parameters inside of a <c>SHADER_PARAMETERS()</c> block. </summary>
-	public List<VariableReflection> ShaderParameters { get; init; }
+	public ReadOnlySpan<VariableReflection> ShaderParameters { get; init; }
 
 	/// <summary> All resources this shader requests. </summary>
-	public List<VariableLayoutReflection> Resources { get; init; }
+	public ReadOnlySpan<VariableLayoutReflection> Resources { get; init; }
 }
