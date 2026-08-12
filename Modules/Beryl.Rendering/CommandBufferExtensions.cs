@@ -53,7 +53,7 @@ public static class CommandBufferExtensions
 				output: cmd.CurrentFramebuffer,
 				resourceGroups: material.Shader.ResourceGroups.AsSpan(),
 				cullingMode: material.Shader.CullingMode,
-				depthComparison: material.Shader.DepthComparison
+				depthInfo: new DepthInfo(material.Shader.DepthWrite, material.Shader.DepthComparison)
 			);
 
 			FrameCountedResource<RenderItem> renderItem = RenderItemCache.Instance.GetOrCreate(new RenderItemKey(vertices, normals, uvs, indices, pipelineKey));

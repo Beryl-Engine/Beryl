@@ -113,7 +113,7 @@ internal sealed class VeldrithResourceFactory(VeldrithDevice device) : IResource
 		var description = new GraphicsPipelineDescription
 		{
 			BlendState = BlendStateDescription.SINGLE_OVERRIDE_BLEND,
-			DepthStencilState = new DepthStencilStateDescription(true, key.WriteDepth, ToVeldrith(key.DepthComparison)),
+			DepthStencilState = new DepthStencilStateDescription(true, key.DepthInfo.WriteDepth, ToVeldrith(key.DepthInfo.DepthComparison)),
 			RasterizerState = ToVeldrith(key.CullingMode),
 			PrimitiveTopology = PrimitiveTopology.TriangleList,
 			ShaderSet = shaderSet,
