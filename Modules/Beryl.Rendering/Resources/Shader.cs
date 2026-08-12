@@ -11,6 +11,9 @@ using System.Text;
 
 namespace Beryl.Rendering.Resources;
 
+/// <summary>
+/// Represents a compiled GPU program.
+/// </summary>
 public class Shader
 {
 	/// <summary> The <see cref="IShaderDefaultsProvider"/> used by shaders. </summary>
@@ -31,8 +34,8 @@ public class Shader
 		set
 		{
 			SlangCompilationResult comp = ShaderBaker.SlangToSpirV(value, Name);
-			VertexBytecode = comp.Stages[SlangStage.Vertex];
-			FragmentBytecode = comp.Stages[SlangStage.Fragment];
+
+			StageBytecode = comp.Stages.ToImmutableDictionary(kvp => ToShaderStage(kvp.Key), kvp => kvp.Value);
 
 			foreach (var attribute in comp.ShaderAttributes)
 			{
@@ -153,26 +156,23 @@ public class Shader
 		}
 	}
 
+	/// <summary> The shader's requested <see cref="RHI.CullingMode"/>. </summary>
+	public CullingMode CullingMode { get; private set; } = CullingMode.Back;
+
+	/// <summary> The shader's requested <see cref="ComparisonMode"/>. </summary>
+	public ComparisonMode DepthComparison { get; private set; } = ComparisonMode.Less;
+
+	/// <summary> Whether or not the shader wants to write to the depth buffer. </summary>
+	public bool DepthWrite { get; private set; } = true;
+
 	/// <summary> The shader's resource definitions. </summary>
 	public ImmutableArray<ShaderResource> Resources { get; private set; } = ImmutableArray<ShaderResource>.Empty;
 
 	/// <summary> The shader's resource definitions, grouped by set. </summary>
 	public ImmutableArray<ShaderResourceGroup> ResourceGroups { get; private set; }
 
-	/// <summary> The shader's raw SPIR-V bytecode. </summary>
-	internal byte[] VertexBytecode { get; private set; } = Array.Empty<byte>();
-
-	/// <summary> The shader's raw SPIR-V bytecode. </summary>
-	internal byte[] FragmentBytecode { get; private set; } = Array.Empty<byte>();
-
-	/// <summary> The shader's requested <see cref="RHI.CullingMode"/>. </summary>
-	internal CullingMode CullingMode { get; private set; } = CullingMode.Back;
-
-	/// <summary> The shader's requested <see cref="ComparisonMode"/>. </summary>
-	internal ComparisonMode DepthComparison { get; private set; } = ComparisonMode.Less;
-
-	/// <summary> Whether or not the shader wants to write to the depth buffer. </summary>
-	internal bool DepthWrite { get; private set; } = true;
+	/// <summary> The raw SPIR-V bytecode for each stage included in this shader. </summary>
+	internal IReadOnlyDictionary<ShaderStages, byte[]> StageBytecode { get; private set; } = ImmutableDictionary<ShaderStages, byte[]>.Empty;
 
 	/// <summary> Initializes a new instance of the <see cref="Shader"/> class. </summary>
 	/// <param name="source">The slang source code.</param>
@@ -182,6 +182,14 @@ public class Shader
 		Name = name;
 		Source = source;
 	}
+
+	private static ShaderStages ToShaderStage(SlangStage stage) => stage switch
+	{
+		SlangStage.Vertex => ShaderStages.Vertex,
+		SlangStage.Fragment => ShaderStages.Fragment,
+		SlangStage.Compute => ShaderStages.Compute,
+		_ => throw new NotSupportedException($"Slang stage '{stage}' has no corresponding {nameof(ShaderStages)}.")
+	};
 }
 
 [ResourceLoader]

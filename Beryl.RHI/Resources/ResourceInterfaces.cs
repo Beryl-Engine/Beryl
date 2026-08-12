@@ -84,5 +84,6 @@ public enum ResourceKind : byte
 public enum ShaderStages : byte
 {
 	Vertex = 1,
-	Fragment = 2
+	Fragment = 2,
+	Compute = 4
 }
