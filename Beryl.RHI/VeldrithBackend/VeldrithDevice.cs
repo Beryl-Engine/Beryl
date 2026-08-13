@@ -27,9 +27,9 @@ internal sealed class VeldrithDevice : IGraphicsDevice
 			Veldrith.BackendInfoVulkan backend = GraphicsDevice.GetVulkanInfo();
 			return new VulkanInfo()
 			{
-				Instance = backend.Instance,
-				Device = backend.Device,
-				PhysicalDevice = backend.PhysicalDevice,
+				Instance = new(backend.Instance),
+				Device = new(backend.Device),
+				PhysicalDevice = new(backend.PhysicalDevice),
 				GraphicsQueueFamilyIndex = backend.GraphicsQueueFamilyIndex
 			};
 		}

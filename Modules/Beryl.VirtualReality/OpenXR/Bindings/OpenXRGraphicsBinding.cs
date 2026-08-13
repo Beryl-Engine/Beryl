@@ -38,9 +38,9 @@ internal sealed class OpenXRGraphicsBinding : OpenXRBinding
 					{
 						Type = StructureType.GraphicsBindingVulkanKhr,
 
-						Instance = new VkHandle(rendering.Device.VulkanInfo.Value.Instance),
-						PhysicalDevice = new VkHandle(rendering.Device.VulkanInfo.Value.PhysicalDevice),
-						Device = new VkHandle(rendering.Device.VulkanInfo.Value.Device),
+						Instance = new VkHandle(rendering.Device.VulkanInfo.Value.Instance.Handle),
+						PhysicalDevice = new VkHandle(rendering.Device.VulkanInfo.Value.PhysicalDevice.Handle),
+						Device = new VkHandle(rendering.Device.VulkanInfo.Value.Device.Handle),
 
 						QueueFamilyIndex = rendering.Device.VulkanInfo.Value.GraphicsQueueFamilyIndex,
 						QueueIndex = 0

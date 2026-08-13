@@ -1,6 +1,8 @@
 // This file is part of the Beryl Game Engine.
 // Licensed under the MIT license. (https://github.com/Beryl-Engine/Beryl/blob/main/LICENSE)
 
+using Silk.NET.Vulkan;
+
 namespace Beryl.RHI;
 
 /// <summary>
@@ -8,9 +10,9 @@ namespace Beryl.RHI;
 /// </summary>
 public readonly struct VulkanInfo
 {
-	public IntPtr Instance { get; init; }
-	public IntPtr PhysicalDevice { get; init; }
-	public IntPtr Device { get; init; }
+	public Instance Instance { get; init; }
+	public PhysicalDevice PhysicalDevice { get; init; }
+	public Device Device { get; init; }
 
 	public uint GraphicsQueueFamilyIndex { get; init; }
 }
