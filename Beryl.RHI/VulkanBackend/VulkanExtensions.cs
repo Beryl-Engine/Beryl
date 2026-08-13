@@ -42,5 +42,27 @@ internal static class VulkanExtensions
 
 			return optDevice.Value;
 		}
+
+		/// <summary> Gets the index of the required queue family. </summary>
+		public unsafe Result GetQueueFamilyIndex(PhysicalDevice device, QueueFlags flags, out uint index)
+		{
+			uint queueFamilyCount = 0;
+			vk.GetPhysicalDeviceQueueFamilyProperties(device, ref queueFamilyCount, null);
+
+			var queueFamilies = new QueueFamilyProperties[queueFamilyCount];
+			vk.GetPhysicalDeviceQueueFamilyProperties(device, &queueFamilyCount, queueFamilies);
+
+			for (uint i = 0; i < queueFamilyCount; i++)
+			{
+				if ((queueFamilies[i].QueueFlags & flags) == flags)
+				{
+					index = i;
+					return Result.Success;
+				}
+			}
+
+			index = 0;
+			return Result.ErrorUnknown;
+		}
 	}
 }

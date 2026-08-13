@@ -1,7 +1,6 @@
 // This file is part of the Beryl Game Engine.
 // Licensed under the MIT license. (https://github.com/Beryl-Engine/Beryl/blob/main/LICENSE)
 
-using Beryl.Common.Utility;
 using Beryl.RHI.Resources;
 using Silk.NET.Core;
 using Silk.NET.Core.Native;
@@ -65,15 +64,14 @@ internal sealed class VulkanDevice : IGraphicsDevice
 			Vk.CreateInstance(in createInfo, null, out Instance instance).ThrowIfFailed();
 
 			PhysicalDevice physDevice = Vk.GetOptimalDevice(instance);
-			var properties = Vk.GetPhysicalDeviceProperty(physDevice);
 
-			string? deviceName = SilkMarshal.PtrToString((IntPtr)properties.DeviceName, NativeStringEncoding.UTF8);
-			BerylConsole.Log($"Using Optimal GPU: {deviceName}");
+			Vk.GetQueueFamilyIndex(physDevice, QueueFlags.GraphicsBit, out uint graphicsFamilyIndex).ThrowIfFailed();
 
 			VulkanInfo = new()
 			{
 				Instance = instance,
-				PhysicalDevice = physDevice
+				PhysicalDevice = physDevice,
+				GraphicsQueueFamilyIndex = graphicsFamilyIndex
 			};
 		}
 		finally
