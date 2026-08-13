@@ -63,9 +63,9 @@ internal sealed class VulkanDevice : IGraphicsDevice
 
 			Vk.CreateInstance(in createInfo, null, out Instance instance).ThrowIfFailed();
 
-			PhysicalDevice physDevice = Vk.GetOptimalDevice(instance);
+			Vk.GetOptimalPhysicalDevice(in instance, out PhysicalDevice physDevice).ThrowIfFailed();
 
-			Vk.GetQueueFamilyIndex(physDevice, QueueFlags.GraphicsBit, out uint graphicsFamilyIndex).ThrowIfFailed();
+			Vk.GetQueueFamilyIndex(in physDevice, QueueFlags.GraphicsBit, out uint graphicsFamilyIndex).ThrowIfFailed();
 
 			VulkanInfo = new()
 			{

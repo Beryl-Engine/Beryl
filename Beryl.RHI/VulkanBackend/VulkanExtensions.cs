@@ -26,25 +26,25 @@ internal static class VulkanExtensions
 	extension (Vk vk)
 	{
 		/// <summary> Gets the best <see cref="PhysicalDevice"/> available for the current system. </summary>
-		public PhysicalDevice GetOptimalDevice(Instance instance)
+		public Result GetOptimalPhysicalDevice(in Instance instance, out PhysicalDevice optDevice)
 		{
-			PhysicalDevice? optDevice = null;
+			optDevice = default;
 
 			IReadOnlyCollection<PhysicalDevice> devices = vk.GetPhysicalDevices(instance);
 			foreach (PhysicalDevice device in devices)
 			{
 				if (vk.GetPhysicalDeviceProperty(device).DeviceType == PhysicalDeviceType.DiscreteGpu)
+				{
 					optDevice = device;
+					return Result.Success;
+				}
 			}
 
-			if (optDevice == null)
-				throw new Exception("Failed to find a Vulkan supported device.");
-
-			return optDevice.Value;
+			return Result.ErrorUnknown;
 		}
 
-		/// <summary> Gets the index of the required queue family. </summary>
-		public unsafe Result GetQueueFamilyIndex(PhysicalDevice device, QueueFlags flags, out uint index)
+		/// <summary> Gets the index of the requested queue family. </summary>
+		public unsafe Result GetQueueFamilyIndex(in PhysicalDevice device, QueueFlags flags, out uint index)
 		{
 			uint queueFamilyCount = 0;
 			vk.GetPhysicalDeviceQueueFamilyProperties(device, ref queueFamilyCount, null);
