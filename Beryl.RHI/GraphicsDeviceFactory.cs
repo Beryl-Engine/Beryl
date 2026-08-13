@@ -1,6 +1,9 @@
 // This file is part of the Beryl Game Engine.
 // Licensed under the MIT license. (https://github.com/Beryl-Engine/Beryl/blob/main/LICENSE)
 
+using Beryl.RHI.VeldrithBackend;
+using Beryl.RHI.VulkanBackend;
+
 namespace Beryl.RHI;
 
 /// <summary>
@@ -17,5 +20,10 @@ public static class GraphicsDeviceFactory
 	};
 
 	/// <summary> Creates a graphics device for <paramref name="backend"/>. </summary>
-	public static IGraphicsDevice Create(RendererBackend backend) => new VeldrithBackend.VeldrithDevice(backend);
+	public static IGraphicsDevice Create(RendererBackend backend) => backend switch
+	{
+		RendererBackend.Vulkan => new VulkanDevice(),
+		RendererBackend.Direct3D12 => new VeldrithDevice(backend),
+		_ => throw new NotSupportedException($"Backend {backend} is not supported.")
+	};
 }
