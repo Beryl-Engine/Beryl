@@ -40,7 +40,7 @@ public class Window
 	{
 		WindowOptions options = WindowOptions.Default with
 		{
-			API = GraphicsAPI.None,
+			API = GraphicsAPI.DefaultVulkan,
 			VSync = Application.Info.Window.VSync,
 			Size = new(Application.Info.Window.Width, Application.Info.Window.Height)
 		};

@@ -2,14 +2,19 @@
 // Licensed under the MIT license. (https://github.com/Beryl-Engine/Beryl/blob/main/LICENSE)
 
 using Beryl.RHI.Resources;
+using Silk.NET.Core;
+using Silk.NET.Core.Native;
+using Silk.NET.Vulkan;
 using Silk.NET.Windowing;
 
 namespace Beryl.RHI.VulkanBackend;
 
 internal sealed class VulkanDevice : IGraphicsDevice
 {
+	internal Vk Vk { get; } = Vk.GetApi();
+
 	/// <inheritdoc/>
-	public VulkanInfo? VulkanInfo { get; } = new();
+	public VulkanInfo? VulkanInfo { get; private set; }
 
 	/// <inheritdoc/>
 	public DeviceFeatures Features { get; } = DeviceFeatures.ClipSpaceYInverted;
@@ -21,9 +26,52 @@ internal sealed class VulkanDevice : IGraphicsDevice
 	public IResourceFactory ResourceFactory => throw new NotImplementedException();
 
 	/// <inheritdoc/>
-	public void Initialize(IWindow window)
+	public unsafe void Initialize(IWindow window)
 	{
+		if (window.VkSurface == null)
+			throw new ArgumentException("Window does not have a Vulkan surface.");
 
+		nint name = SilkMarshal.StringToPtr("Beryl");
+
+		try
+		{
+			ApplicationInfo appInfo = new()
+			{
+				SType = StructureType.ApplicationInfo,
+
+				PApplicationName = (byte*)name,
+				ApplicationVersion = new Version32(1, 0, 0),
+
+				PEngineName = (byte*)name,
+				EngineVersion = new Version32(1, 0, 0),
+
+				ApiVersion = Vk.Version13
+			};
+
+			byte** windowExtensions = window.VkSurface.GetRequiredExtensions(out uint count);
+
+			InstanceCreateInfo createInfo = new()
+			{
+				SType = StructureType.InstanceCreateInfo,
+
+				PApplicationInfo = &appInfo,
+				
+				EnabledExtensionCount = count,
+				PpEnabledExtensionNames = windowExtensions,
+				EnabledLayerCount = 0,
+			};
+
+			Vk.CreateInstance(in createInfo, null, out Instance instance).ThrowIfFailed();
+
+			VulkanInfo = new()
+			{
+				Instance = instance
+			};
+		}
+		finally
+		{
+			SilkMarshal.FreeString(name);
+		}
 	}
 
 	/// <inheritdoc/>
