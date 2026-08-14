@@ -1,6 +1,7 @@
 // This file is part of the Beryl Game Engine.
 // Licensed under the MIT license. (https://github.com/Beryl-Engine/Beryl/blob/main/LICENSE)
 
+using Beryl.Common.Utility;
 using Beryl.RHI.Resources;
 using Silk.NET.Core;
 using Silk.NET.Core.Native;
@@ -50,18 +51,39 @@ internal sealed class VulkanDevice : IGraphicsDevice
 
 			byte** windowExtensions = window.VkSurface.GetRequiredExtensions(out uint count);
 
+			string[] instanceExtensions =
+			[
+				..SilkMarshal.PtrToStringArray((nint)windowExtensions, (int)count),
+				"VK_EXT_debug_utils",
+			];
+
+			if (Vk.IsLayerAvailable("VK_LAYER_KHRONOS_validation") == false)
+				throw new Exception("Vulkan validation layer is not available."); // Hack
+
+			string[] instanceLayers =
+			[
+				"VK_LAYER_KHRONOS_validation"
+			];
+
+			byte** instanceExtensionsPtr = (byte**)SilkMarshal.StringArrayToPtr(instanceExtensions);
+			byte** instanceLayersPtr = (byte**)SilkMarshal.StringArrayToPtr(instanceLayers);
+
 			InstanceCreateInfo instanceCreateInfo = new()
 			{
 				SType = StructureType.InstanceCreateInfo,
 
 				PApplicationInfo = &appInfo,
 				
-				EnabledExtensionCount = count,
-				PpEnabledExtensionNames = windowExtensions,
-				EnabledLayerCount = 0,
+				EnabledExtensionCount = (uint)instanceExtensions.Length,
+				PpEnabledExtensionNames = instanceExtensionsPtr,
+
+				EnabledLayerCount = (uint)instanceLayers.Length,
+				PpEnabledLayerNames = instanceLayersPtr
 			};
 
 			Vk.CreateInstance(in instanceCreateInfo, null, out Instance instance).ThrowIfFailed();
+			Vk.CreateDebugCallback(in instance, (severity, type, message) => BerylConsole.Log($"[{severity}] [{type}] {message}", "Vulkan")).ThrowIfFailed();
+			Vk.SubmitDebugMessage(in instance, DebugUtilsMessageSeverityFlagsEXT.InfoBitExt, DebugUtilsMessageTypeFlagsEXT.GeneralBitExt, "Initialized Vulkan Debug callback.");
 
 			Vk.GetOptimalPhysicalDevice(in instance, out PhysicalDevice physDevice).ThrowIfFailed();
 
@@ -93,6 +115,9 @@ internal sealed class VulkanDevice : IGraphicsDevice
 			Queue graphicsQueue = Vk.GetDeviceQueue(device, graphicsFamilyIndex, 0);
 
 			Vk.GetWindowSurface(in instance, in window, out SurfaceKHR surface).ThrowIfFailed();
+
+			SilkMarshal.Free((nint)instanceExtensionsPtr);
+			SilkMarshal.Free((nint)instanceLayersPtr);
 
 			VulkanInfo = new()
 			{
@@ -130,6 +155,7 @@ internal sealed class VulkanDevice : IGraphicsDevice
 			return;
 
 		Vk.DestroyDevice(VulkanInfo.Value.Device, null);
+		Vk.DestroyDebugCallback(VulkanInfo.Value.Instance);
 		Vk.DestroyInstance(VulkanInfo.Value.Instance, null);
 		Vk.Dispose();
 	}
