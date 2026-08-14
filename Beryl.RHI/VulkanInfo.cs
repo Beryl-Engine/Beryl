@@ -13,6 +13,8 @@ public readonly struct VulkanInfo
 	public Instance Instance { get; init; }
 	public PhysicalDevice PhysicalDevice { get; init; }
 	public Device Device { get; init; }
+	public SurfaceKHR Surface { get; init; }
 
 	public uint GraphicsQueueFamilyIndex { get; init; }
+	public Queue GraphicsQueue { get; init; }
 }

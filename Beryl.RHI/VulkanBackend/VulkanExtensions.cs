@@ -1,7 +1,9 @@
 // This file is part of the Beryl Game Engine.
 // Licensed under the MIT license. (https://github.com/Beryl-Engine/Beryl/blob/main/LICENSE)
 
+using Silk.NET.Core.Contexts;
 using Silk.NET.Vulkan;
+using Silk.NET.Windowing;
 
 namespace Beryl.RHI.VulkanBackend;
 
@@ -73,6 +75,22 @@ internal static class VulkanExtensions
 
 			index = 0;
 			return Result.ErrorUnknown;
+		}
+
+		/// <summary> Gets a <see cref="SurfaceKHR"/> for a Silk.NET <see cref="IWindow"/>. </summary>
+		public unsafe Result GetWindowSurface(in Instance instance, in IWindow window, out SurfaceKHR surface)
+		{
+			IVkSurface? winSurface = window.VkSurface;
+
+			if (winSurface == null)
+			{
+				surface = default;
+				return Result.ErrorUnknown;
+			}
+
+			surface = new SurfaceKHR(winSurface.Create<AllocationCallbacks>(instance.ToHandle(), null).Handle);
+
+			return Result.Success;
 		}
 	}
 }

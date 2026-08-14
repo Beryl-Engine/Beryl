@@ -90,12 +90,19 @@ internal sealed class VulkanDevice : IGraphicsDevice
 
 			Vk.CreateDevice(physDevice, in deviceCreateInfo, null, out Device device).ThrowIfFailed();
 
+			Queue graphicsQueue = Vk.GetDeviceQueue(device, graphicsFamilyIndex, 0);
+
+			Vk.GetWindowSurface(in instance, in window, out SurfaceKHR surface).ThrowIfFailed();
+
 			VulkanInfo = new()
 			{
 				Instance = instance,
 				PhysicalDevice = physDevice,
+				Device = device,
+				Surface = surface,
+
 				GraphicsQueueFamilyIndex = graphicsFamilyIndex,
-				Device = device
+				GraphicsQueue = graphicsQueue
 			};
 		}
 		finally
