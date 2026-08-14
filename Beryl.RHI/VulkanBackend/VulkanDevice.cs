@@ -50,7 +50,7 @@ internal sealed class VulkanDevice : IGraphicsDevice
 
 			byte** windowExtensions = window.VkSurface.GetRequiredExtensions(out uint count);
 
-			InstanceCreateInfo createInfo = new()
+			InstanceCreateInfo instanceCreateInfo = new()
 			{
 				SType = StructureType.InstanceCreateInfo,
 
@@ -61,17 +61,41 @@ internal sealed class VulkanDevice : IGraphicsDevice
 				EnabledLayerCount = 0,
 			};
 
-			Vk.CreateInstance(in createInfo, null, out Instance instance).ThrowIfFailed();
+			Vk.CreateInstance(in instanceCreateInfo, null, out Instance instance).ThrowIfFailed();
 
 			Vk.GetOptimalPhysicalDevice(in instance, out PhysicalDevice physDevice).ThrowIfFailed();
 
 			Vk.GetQueueFamilyIndex(in physDevice, QueueFlags.GraphicsBit, out uint graphicsFamilyIndex).ThrowIfFailed();
 
+			float priority = 1.0f;
+			DeviceQueueCreateInfo queueCreateInfo = new()
+			{
+				SType = StructureType.DeviceQueueCreateInfo,
+				QueueFamilyIndex = graphicsFamilyIndex,
+				QueueCount = 1,
+				PQueuePriorities = &priority
+			};
+
+			PhysicalDeviceFeatures features = new();
+
+			DeviceCreateInfo deviceCreateInfo = new()
+			{
+				SType = StructureType.DeviceCreateInfo,
+
+				PQueueCreateInfos = &queueCreateInfo,
+				QueueCreateInfoCount = 1,
+
+				PEnabledFeatures = &features
+			};
+
+			Vk.CreateDevice(physDevice, in deviceCreateInfo, null, out Device device).ThrowIfFailed();
+
 			VulkanInfo = new()
 			{
 				Instance = instance,
 				PhysicalDevice = physDevice,
-				GraphicsQueueFamilyIndex = graphicsFamilyIndex
+				GraphicsQueueFamilyIndex = graphicsFamilyIndex,
+				Device = device
 			};
 		}
 		finally
@@ -93,5 +117,13 @@ internal sealed class VulkanDevice : IGraphicsDevice
 	public void UpdateBuffer<T>(IBuffer buffer, uint offset, ReadOnlySpan<T> data) where T : unmanaged => throw new NotImplementedException();
 
 	/// <inheritdoc/>
-	public void Dispose() => throw new NotImplementedException();
+	public unsafe void Dispose()
+	{
+		if (VulkanInfo == null)
+			return;
+
+		Vk.DestroyDevice(VulkanInfo.Value.Device, null);
+		Vk.DestroyInstance(VulkanInfo.Value.Instance, null);
+		Vk.Dispose();
+	}
 }

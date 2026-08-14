@@ -28,12 +28,22 @@ internal static class VulkanExtensions
 		/// <summary> Gets the best <see cref="PhysicalDevice"/> available for the current system. </summary>
 		public Result GetOptimalPhysicalDevice(in Instance instance, out PhysicalDevice optDevice)
 		{
+			// This is obviously dumb
 			optDevice = default;
 
 			IReadOnlyCollection<PhysicalDevice> devices = vk.GetPhysicalDevices(instance);
 			foreach (PhysicalDevice device in devices)
 			{
 				if (vk.GetPhysicalDeviceProperty(device).DeviceType == PhysicalDeviceType.DiscreteGpu)
+				{
+					optDevice = device;
+					return Result.Success;
+				}
+			}
+
+			foreach (PhysicalDevice device in devices)
+			{
+				if (vk.GetPhysicalDeviceProperty(device).DeviceType == PhysicalDeviceType.IntegratedGpu)
 				{
 					optDevice = device;
 					return Result.Success;
