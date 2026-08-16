@@ -144,7 +144,7 @@ internal static class VulkanExtensions
 		/// <summary> Gets the index of the requested queue family. </summary>
 		public Result GetQueueFamilyIndex(in PhysicalDevice device, QueueFlags flags, out uint index)
 		{
-			ReadOnlySpan<QueueFamilyProperties> queueFamilies = GetQueueFamilyProperties(vk, in device);
+			ReadOnlySpan<QueueFamilyProperties> queueFamilies = vk.GetQueueFamilyProperties(in device);
 			foreach (QueueFamilyProperties queueFamily in queueFamilies)
 			{
 				if ((queueFamily.QueueFlags & flags) == flags)
@@ -159,7 +159,7 @@ internal static class VulkanExtensions
 			return Result.ErrorUnknown;
 		}
 
-		public Result GetPresentQueueFamilyIndex(in Instance instance, in PhysicalDevice device, in SurfaceKHR surface, out uint index)
+		public Result GetPresentQueueFamilyIndex(in Instance instance, in PhysicalDevice physDevice, in SurfaceKHR surface, out uint index)
 		{
 			if (vk.TryGetInstanceExtension<KhrSurface>(instance, out var khrSurface) == false)
 			{
@@ -167,11 +167,11 @@ internal static class VulkanExtensions
 				return Result.ErrorExtensionNotPresent;
 			}
 
-			uint queueFamilyCount = (uint)GetQueueFamilyProperties(vk, in device).Length;
+			uint queueFamilyCount = (uint)vk.GetQueueFamilyProperties(in physDevice).Length;
 
 			for (uint i = 0; i < queueFamilyCount; i++)
 			{
-				khrSurface.GetPhysicalDeviceSurfaceSupport(device, i, surface, out Bool32 supported);
+				khrSurface.GetPhysicalDeviceSurfaceSupport(physDevice, i, surface, out Bool32 supported);
 				if (supported)
 				{
 					index = i;
@@ -183,14 +183,125 @@ internal static class VulkanExtensions
 			return Result.ErrorUnknown;
 		}
 
+		/// <summary> Gets the surface capabilities. </summary>
+		public Result GetSurfaceCapabilities(in Instance instance, in PhysicalDevice physDevice, in SurfaceKHR surface, out SurfaceCapabilitiesKHR capabilities)
+		{
+			if (vk.TryGetInstanceExtension<KhrSurface>(instance, out var khrSurface) == false)
+			{
+				capabilities = default;
+				return Result.ErrorExtensionNotPresent;
+			}
+
+			return khrSurface.GetPhysicalDeviceSurfaceCapabilities(physDevice, surface, out capabilities);
+		}
+
+		/// <summary> Gets the supported surface formats. </summary>
+		public unsafe Result GetSurfaceFormats(in Instance instance, in PhysicalDevice physDevice, in SurfaceKHR surface, out SurfaceFormatKHR[] formats)
+		{
+			if (vk.TryGetInstanceExtension<KhrSurface>(instance, out var khrSurface) == false)
+			{
+				formats = [];
+				return Result.ErrorExtensionNotPresent;
+			}
+
+			uint formatCount = 0;
+			khrSurface.GetPhysicalDeviceSurfaceFormats(physDevice, surface, ref formatCount, null);
+
+			formats = new SurfaceFormatKHR[formatCount];
+			fixed (SurfaceFormatKHR* pFormats = formats)
+				return khrSurface.GetPhysicalDeviceSurfaceFormats(physDevice, surface, &formatCount, pFormats);
+		}
+
+		/// <summary> Creates an optimal swapchain for the given physical device and surface. </summary>
+		public unsafe Result CreateOptimalSwapchain(in Instance instance, in PhysicalDevice physDevice, in Device device, in SurfaceKHR surface, out SwapchainKHR swapchain)
+		{
+			swapchain = default;
+
+			if (vk.TryGetInstanceExtension<KhrSurface>(instance, out var khrSurface) == false)
+				return Result.ErrorExtensionNotPresent;
+
+			if (vk.TryGetDeviceExtension<KhrSwapchain>(instance, device, out var khrSwapchain) == false)
+				return Result.ErrorExtensionNotPresent;
+
+			vk.GetSurfaceCapabilities(in instance, in physDevice, in surface, out SurfaceCapabilitiesKHR capabilities).ThrowIfFailed();
+			vk.GetSurfaceFormats(in instance, physDevice, in surface, out SurfaceFormatKHR[] formats).ThrowIfFailed();
+			vk.GetSurfacePresentModes(in instance, physDevice, in surface, out PresentModeKHR[] presentModes).ThrowIfFailed();
+
+			vk.GetQueueFamilyIndex(in physDevice, QueueFlags.GraphicsBit, out uint graphicsFamilyIndex).ThrowIfFailed();
+			vk.GetPresentQueueFamilyIndex(in instance, in physDevice, in surface, out uint presentFamilyIndex).ThrowIfFailed();
+
+			SurfaceFormatKHR format = formats.FirstOrDefault(f => f.Format == Format.B8G8R8A8Srgb && f.ColorSpace == ColorSpaceKHR.SpaceSrgbNonlinearKhr, formats[0]); // Prefer SRGB
+			PresentModeKHR presentMode = presentModes.Contains(PresentModeKHR.MailboxKhr) ? PresentModeKHR.MailboxKhr : PresentModeKHR.FifoKhr; // Prefer Mailbox
+			Extent2D extent = capabilities.CurrentExtent.Width != uint.MaxValue ? capabilities.CurrentExtent : capabilities.MaxImageExtent;
+
+			uint imageCount = capabilities.MinImageCount + 1;
+			if (capabilities.MaxImageCount > 0 && imageCount > capabilities.MaxImageCount)
+				imageCount = capabilities.MaxImageCount;
+
+			SwapchainCreateInfoKHR createInfo = new()
+			{
+				SType = StructureType.SwapchainCreateInfoKhr,
+
+				Surface = surface,
+				MinImageCount = imageCount,
+
+				ImageFormat = format.Format,
+				ImageColorSpace = format.ColorSpace,
+				ImageExtent = extent,
+				ImageArrayLayers = 1,
+				ImageUsage = ImageUsageFlags.ColorAttachmentBit,
+
+				PreTransform = capabilities.CurrentTransform,
+				CompositeAlpha = CompositeAlphaFlagsKHR.OpaqueBitKhr,
+				PresentMode = presentMode,
+				Clipped = true,
+
+				OldSwapchain = default
+			};
+
+			if (graphicsFamilyIndex != presentFamilyIndex)
+			{
+				uint* indices = stackalloc uint[] { graphicsFamilyIndex, presentFamilyIndex };
+
+				createInfo.ImageSharingMode = SharingMode.Concurrent;
+				createInfo.QueueFamilyIndexCount = 2;
+				createInfo.PQueueFamilyIndices = indices;
+			}
+			else
+			{
+				createInfo.ImageSharingMode = SharingMode.Exclusive;
+			}
+
+			return khrSwapchain.CreateSwapchain(device, in createInfo, null, out swapchain);
+		}
+
+		/// <summary> Gets the supported present modes for a physical device and surface. </summary>
+		public unsafe Result GetSurfacePresentModes(in Instance instance, in PhysicalDevice physDevice, in SurfaceKHR surface, out PresentModeKHR[] presentModes)
+		{
+			if (vk.TryGetInstanceExtension<KhrSurface>(instance, out var khrSurface) == false)
+			{
+				presentModes = [];
+				return Result.ErrorExtensionNotPresent;
+			}
+
+			uint modeCount = 0;
+			khrSurface.GetPhysicalDeviceSurfacePresentModes(physDevice, surface, ref modeCount, null);
+
+			presentModes = new PresentModeKHR[modeCount];
+			fixed (PresentModeKHR* pModes = presentModes)
+				khrSurface.GetPhysicalDeviceSurfacePresentModes(physDevice, surface, &modeCount, pModes);
+
+			return Result.Success;
+		}
+
 		/// <summary> Gets the properties of all queue families. </summary>
-		public unsafe ReadOnlySpan<QueueFamilyProperties> GetQueueFamilyProperties(in PhysicalDevice device)
+		public unsafe ReadOnlySpan<QueueFamilyProperties> GetQueueFamilyProperties(in PhysicalDevice physDevice)
 		{
 			uint queueFamilyCount = 0;
-			vk.GetPhysicalDeviceQueueFamilyProperties(device, ref queueFamilyCount, null);
+			vk.GetPhysicalDeviceQueueFamilyProperties(physDevice, ref queueFamilyCount, null);
 
 			var queueFamilies = new QueueFamilyProperties[queueFamilyCount];
-			vk.GetPhysicalDeviceQueueFamilyProperties(device, &queueFamilyCount, queueFamilies);
+			vk.GetPhysicalDeviceQueueFamilyProperties(physDevice, &queueFamilyCount, queueFamilies);
 
 			return queueFamilies;
 		}

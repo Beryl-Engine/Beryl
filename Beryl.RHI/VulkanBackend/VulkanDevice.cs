@@ -6,6 +6,8 @@ using Beryl.RHI.Resources;
 using Silk.NET.Core;
 using Silk.NET.Core.Native;
 using Silk.NET.Vulkan;
+using Silk.NET.Vulkan.Extensions.EXT;
+using Silk.NET.Vulkan.Extensions.KHR;
 using Silk.NET.Windowing;
 
 namespace Beryl.RHI.VulkanBackend;
@@ -54,7 +56,7 @@ internal sealed class VulkanDevice : IGraphicsDevice
 			string[] instanceExtensions =
 			[
 				..SilkMarshal.PtrToStringArray((nint)windowExtensions, (int)count),
-				"VK_EXT_debug_utils",
+				ExtDebugUtils.ExtensionName
 			];
 
 			if (Vk.IsLayerAvailable("VK_LAYER_KHRONOS_validation") == false)
@@ -119,12 +121,22 @@ internal sealed class VulkanDevice : IGraphicsDevice
 
 			PhysicalDeviceFeatures features = new();
 
+			string[] deviceExtensions =
+			[
+				KhrSwapchain.ExtensionName
+			];
+
+			byte** deviceExtensionsPtr = (byte**)SilkMarshal.StringArrayToPtr(deviceExtensions);
+
 			DeviceCreateInfo deviceCreateInfo = new()
 			{
 				SType = StructureType.DeviceCreateInfo,
 
 				PQueueCreateInfos = pQueueCreateInfos,
 				QueueCreateInfoCount = (uint)queueFamilyIndices.Count,
+
+				PpEnabledExtensionNames = deviceExtensionsPtr,
+				EnabledExtensionCount = (uint)deviceExtensions.Length,
 
 				PEnabledFeatures = &features
 			};
@@ -136,6 +148,9 @@ internal sealed class VulkanDevice : IGraphicsDevice
 
 			SilkMarshal.Free((nint)instanceExtensionsPtr);
 			SilkMarshal.Free((nint)instanceLayersPtr);
+			SilkMarshal.Free((nint)deviceExtensionsPtr);
+
+			Vk.CreateOptimalSwapchain(in instance, in physDevice, in device, in surface, out SwapchainKHR swapchain).ThrowIfFailed();
 
 			VulkanInfo = new()
 			{
