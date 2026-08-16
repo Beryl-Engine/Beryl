@@ -11,6 +11,9 @@ using Silk.NET.Windowing;
 
 namespace Beryl.RHI.VulkanBackend;
 
+// TODO:
+// Try and remove all fixed statements
+
 /// <summary>
 /// Extensions for Silk.NET.Vulkan.
 /// </summary>
@@ -212,10 +215,29 @@ internal static class VulkanExtensions
 				return khrSurface.GetPhysicalDeviceSurfaceFormats(physDevice, surface, &formatCount, pFormats);
 		}
 
+		/// <summary> Gets the images belonging to a swapchain. </summary>
+		public unsafe Result GetSwapchainImages(in Instance instance, in Device device, in SwapchainKHR swapchain, out Image[] images)
+		{
+			if (vk.TryGetDeviceExtension<KhrSwapchain>(instance, device, out var khrSwapchain) == false)
+			{
+				images = [];
+				return Result.ErrorExtensionNotPresent;
+			}
+
+			uint imageCount = 0;
+			khrSwapchain.GetSwapchainImages(device, swapchain, ref imageCount, null);
+
+			images = new Image[imageCount];
+			fixed (Image* pImages = images)
+				return khrSwapchain.GetSwapchainImages(device, swapchain, &imageCount, pImages);
+		}
+
 		/// <summary> Creates an optimal swapchain for the given physical device and surface. </summary>
-		public unsafe Result CreateOptimalSwapchain(in Instance instance, in PhysicalDevice physDevice, in Device device, in SurfaceKHR surface, out SwapchainKHR swapchain)
+		public unsafe Result CreateOptimalSwapchain(in Instance instance, in PhysicalDevice physDevice, in Device device, in SurfaceKHR surface, out SwapchainKHR swapchain, out SurfaceFormatKHR swapchainFormat, out Extent2D swapchainExtent)
 		{
 			swapchain = default;
+			swapchainFormat = default;
+			swapchainExtent = default;
 
 			if (vk.TryGetInstanceExtension<KhrSurface>(instance, out var khrSurface) == false)
 				return Result.ErrorExtensionNotPresent;
@@ -230,9 +252,9 @@ internal static class VulkanExtensions
 			vk.GetQueueFamilyIndex(in physDevice, QueueFlags.GraphicsBit, out uint graphicsFamilyIndex).ThrowIfFailed();
 			vk.GetPresentQueueFamilyIndex(in instance, in physDevice, in surface, out uint presentFamilyIndex).ThrowIfFailed();
 
-			SurfaceFormatKHR format = formats.FirstOrDefault(f => f.Format == Format.B8G8R8A8Srgb && f.ColorSpace == ColorSpaceKHR.SpaceSrgbNonlinearKhr, formats[0]); // Prefer SRGB
+			swapchainFormat = formats.FirstOrDefault(f => f.Format == Format.B8G8R8A8Srgb && f.ColorSpace == ColorSpaceKHR.SpaceSrgbNonlinearKhr, formats[0]); // Prefer SRGB
 			PresentModeKHR presentMode = presentModes.Contains(PresentModeKHR.MailboxKhr) ? PresentModeKHR.MailboxKhr : PresentModeKHR.FifoKhr; // Prefer Mailbox
-			Extent2D extent = capabilities.CurrentExtent.Width != uint.MaxValue ? capabilities.CurrentExtent : capabilities.MaxImageExtent;
+			swapchainExtent = capabilities.CurrentExtent.Width != uint.MaxValue ? capabilities.CurrentExtent : capabilities.MaxImageExtent;
 
 			uint imageCount = capabilities.MinImageCount + 1;
 			if (capabilities.MaxImageCount > 0 && imageCount > capabilities.MaxImageCount)
@@ -245,9 +267,9 @@ internal static class VulkanExtensions
 				Surface = surface,
 				MinImageCount = imageCount,
 
-				ImageFormat = format.Format,
-				ImageColorSpace = format.ColorSpace,
-				ImageExtent = extent,
+				ImageFormat = swapchainFormat.Format,
+				ImageColorSpace = swapchainFormat.ColorSpace,
+				ImageExtent = swapchainExtent,
 				ImageArrayLayers = 1,
 				ImageUsage = ImageUsageFlags.ColorAttachmentBit,
 

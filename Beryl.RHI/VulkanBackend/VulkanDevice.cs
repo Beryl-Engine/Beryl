@@ -150,7 +150,8 @@ internal sealed class VulkanDevice : IGraphicsDevice
 			SilkMarshal.Free((nint)instanceLayersPtr);
 			SilkMarshal.Free((nint)deviceExtensionsPtr);
 
-			Vk.CreateOptimalSwapchain(in instance, in physDevice, in device, in surface, out SwapchainKHR swapchain).ThrowIfFailed();
+			Vk.CreateOptimalSwapchain(in instance, in physDevice, in device, in surface, out SwapchainKHR swapchain, out SurfaceFormatKHR swapchainFormat, out Extent2D swapchainExtent).ThrowIfFailed();
+			Vk.GetSwapchainImages(in instance, in device, in swapchain, out Image[] images).ThrowIfFailed();
 
 			VulkanInfo = new()
 			{
@@ -158,6 +159,7 @@ internal sealed class VulkanDevice : IGraphicsDevice
 				PhysicalDevice = physDevice,
 				Device = device,
 				Surface = surface,
+				Swapchain = swapchain,
 
 				GraphicsQueueFamilyIndex = graphicsFamilyIndex,
 				GraphicsQueue = graphicsQueue,
