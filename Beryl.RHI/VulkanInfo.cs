@@ -17,4 +17,7 @@ public readonly struct VulkanInfo
 
 	public uint GraphicsQueueFamilyIndex { get; init; }
 	public Queue GraphicsQueue { get; init; }
+
+	public uint PresentQueueFamilyIndex { get; init; }
+	public Queue PresentQueue { get; init; }
 }

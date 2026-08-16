@@ -1,10 +1,12 @@
 // This file is part of the Beryl Game Engine.
 // Licensed under the MIT license. (https://github.com/Beryl-Engine/Beryl/blob/main/LICENSE)
 
+using Silk.NET.Core;
 using Silk.NET.Core.Contexts;
 using Silk.NET.Core.Native;
 using Silk.NET.Vulkan;
 using Silk.NET.Vulkan.Extensions.EXT;
+using Silk.NET.Vulkan.Extensions.KHR;
 using Silk.NET.Windowing;
 
 namespace Beryl.RHI.VulkanBackend;
@@ -140,17 +142,37 @@ internal static class VulkanExtensions
 		}
 
 		/// <summary> Gets the index of the requested queue family. </summary>
-		public unsafe Result GetQueueFamilyIndex(in PhysicalDevice device, QueueFlags flags, out uint index)
+		public Result GetQueueFamilyIndex(in PhysicalDevice device, QueueFlags flags, out uint index)
 		{
-			uint queueFamilyCount = 0;
-			vk.GetPhysicalDeviceQueueFamilyProperties(device, ref queueFamilyCount, null);
+			ReadOnlySpan<QueueFamilyProperties> queueFamilies = GetQueueFamilyProperties(vk, in device);
+			foreach (QueueFamilyProperties queueFamily in queueFamilies)
+			{
+				if ((queueFamily.QueueFlags & flags) == flags)
+				{
+					index = (uint)queueFamilies.IndexOf(queueFamily);
+					return Result.Success;
+				}
+			}
 
-			var queueFamilies = new QueueFamilyProperties[queueFamilyCount];
-			vk.GetPhysicalDeviceQueueFamilyProperties(device, &queueFamilyCount, queueFamilies);
+			index = 0;
+
+			return Result.ErrorUnknown;
+		}
+
+		public Result GetPresentQueueFamilyIndex(in Instance instance, in PhysicalDevice device, in SurfaceKHR surface, out uint index)
+		{
+			if (vk.TryGetInstanceExtension<KhrSurface>(instance, out var khrSurface) == false)
+			{
+				index = 0;
+				return Result.ErrorExtensionNotPresent;
+			}
+
+			uint queueFamilyCount = (uint)GetQueueFamilyProperties(vk, in device).Length;
 
 			for (uint i = 0; i < queueFamilyCount; i++)
 			{
-				if ((queueFamilies[i].QueueFlags & flags) == flags)
+				khrSurface.GetPhysicalDeviceSurfaceSupport(device, i, surface, out Bool32 supported);
+				if (supported)
 				{
 					index = i;
 					return Result.Success;
@@ -159,6 +181,18 @@ internal static class VulkanExtensions
 
 			index = 0;
 			return Result.ErrorUnknown;
+		}
+
+		/// <summary> Gets the properties of all queue families. </summary>
+		public unsafe ReadOnlySpan<QueueFamilyProperties> GetQueueFamilyProperties(in PhysicalDevice device)
+		{
+			uint queueFamilyCount = 0;
+			vk.GetPhysicalDeviceQueueFamilyProperties(device, ref queueFamilyCount, null);
+
+			var queueFamilies = new QueueFamilyProperties[queueFamilyCount];
+			vk.GetPhysicalDeviceQueueFamilyProperties(device, &queueFamilyCount, queueFamilies);
+
+			return queueFamilies;
 		}
 
 		/// <summary> Gets a <see cref="SurfaceKHR"/> for a Silk.NET <see cref="IWindow"/>. </summary>

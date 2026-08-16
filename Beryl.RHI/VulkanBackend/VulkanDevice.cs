@@ -87,16 +87,35 @@ internal sealed class VulkanDevice : IGraphicsDevice
 
 			Vk.GetOptimalPhysicalDevice(in instance, out PhysicalDevice physDevice).ThrowIfFailed();
 
-			Vk.GetQueueFamilyIndex(in physDevice, QueueFlags.GraphicsBit, out uint graphicsFamilyIndex).ThrowIfFailed();
+			Vk.GetWindowSurface(in instance, in window, out SurfaceKHR surface).ThrowIfFailed();
 
-			float priority = 1.0f;
-			DeviceQueueCreateInfo queueCreateInfo = new()
+			Vk.GetQueueFamilyIndex(in physDevice, QueueFlags.GraphicsBit, out uint graphicsFamilyIndex).ThrowIfFailed();
+			Vk.GetPresentQueueFamilyIndex(in instance, in physDevice, in surface, out uint presentFamilyIndex).ThrowIfFailed();
+
+			// Merge duplicates
+			// This is pretty yuck
+			HashSet<uint> queueFamilyIndices = new()
 			{
-				SType = StructureType.DeviceQueueCreateInfo,
-				QueueFamilyIndex = graphicsFamilyIndex,
-				QueueCount = 1,
-				PQueuePriorities = &priority
+				graphicsFamilyIndex,
+				presentFamilyIndex
 			};
+
+			DeviceQueueCreateInfo* pQueueCreateInfos = stackalloc DeviceQueueCreateInfo[queueFamilyIndices.Count];
+			float* pQueuePriorities = stackalloc float[queueFamilyIndices.Count];
+
+			int i = 0;
+			foreach (uint familyIndex in queueFamilyIndices)
+			{
+				pQueuePriorities[i] = 1.0f;
+				pQueueCreateInfos[i] = new()
+				{
+					SType = StructureType.DeviceQueueCreateInfo,
+					QueueFamilyIndex = familyIndex,
+					QueueCount = 1,
+					PQueuePriorities = &pQueuePriorities[i]
+				};
+				i++;
+			}
 
 			PhysicalDeviceFeatures features = new();
 
@@ -104,8 +123,8 @@ internal sealed class VulkanDevice : IGraphicsDevice
 			{
 				SType = StructureType.DeviceCreateInfo,
 
-				PQueueCreateInfos = &queueCreateInfo,
-				QueueCreateInfoCount = 1,
+				PQueueCreateInfos = pQueueCreateInfos,
+				QueueCreateInfoCount = (uint)queueFamilyIndices.Count,
 
 				PEnabledFeatures = &features
 			};
@@ -113,8 +132,7 @@ internal sealed class VulkanDevice : IGraphicsDevice
 			Vk.CreateDevice(physDevice, in deviceCreateInfo, null, out Device device).ThrowIfFailed();
 
 			Queue graphicsQueue = Vk.GetDeviceQueue(device, graphicsFamilyIndex, 0);
-
-			Vk.GetWindowSurface(in instance, in window, out SurfaceKHR surface).ThrowIfFailed();
+			Queue presentQueue = Vk.GetDeviceQueue(device, presentFamilyIndex, 0);
 
 			SilkMarshal.Free((nint)instanceExtensionsPtr);
 			SilkMarshal.Free((nint)instanceLayersPtr);
@@ -127,7 +145,10 @@ internal sealed class VulkanDevice : IGraphicsDevice
 				Surface = surface,
 
 				GraphicsQueueFamilyIndex = graphicsFamilyIndex,
-				GraphicsQueue = graphicsQueue
+				GraphicsQueue = graphicsQueue,
+
+				PresentQueueFamilyIndex = presentFamilyIndex,
+				PresentQueue = presentQueue
 			};
 		}
 		finally
