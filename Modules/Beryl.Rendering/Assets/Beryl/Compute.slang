@@ -1,20 +1,13 @@
 // Compute.slang
-// Provides GPU-side access into the Scene.
+// Debugging Compute stuff
 
 import Beryl.Core;
 import Beryl.Attributes;
 
 #include "Beryl/Preprocessor.slang"
 
-SHADER_ATTRIBUTES(
-	[ShaderPass("Opaque")]
-)
-
-SHADER_PARAMETERS(
-	[DefaultFloat3(0.15, 0.35, 0.75)]
-    float3 ZenithColor;
-)
-
+SHADER_ATTRIBUTES()
+SHADER_PARAMETERS()
 
 [Shader("compute")]
 [NumThreads(4, 1, 1)]

@@ -187,7 +187,7 @@ public class Shader
 	}
 
 	/// <summary> Runs a compute dispatch. </summary>
-	public void Dispatch(uint x, uint y, uint z, Action? onComplete = null)
+	public void Dispatch(uint x, uint y, uint z)
 	{
 		if (!StageBytecode.TryGetValue(ShaderStages.Compute, out byte[]? bytecode))
 			return;
@@ -207,8 +207,6 @@ public class Shader
 		commandBuffer.Object.End();
 
 		ModuleManager.GetModule<RenderingModule>()?.SubmitCommandBuffer(commandBuffer.Object);
-
-		onComplete?.Invoke();
 	}
 
 	private void BindComputeResources(ICommandBuffer cmd)
