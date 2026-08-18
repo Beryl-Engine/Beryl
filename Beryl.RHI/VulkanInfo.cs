@@ -10,6 +10,8 @@ namespace Beryl.RHI;
 /// </summary>
 public readonly struct VulkanInfo
 {
+	public Vk Vk { get; init; }
+
 	public Instance Instance { get; init; }
 	public PhysicalDevice PhysicalDevice { get; init; }
 	public Device Device { get; init; }

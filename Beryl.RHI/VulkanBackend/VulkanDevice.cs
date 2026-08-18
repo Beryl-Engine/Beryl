@@ -14,8 +14,6 @@ namespace Beryl.RHI.VulkanBackend;
 
 internal sealed class VulkanDevice : IGraphicsDevice
 {
-	internal Vk Vk { get; } = Vk.GetApi();
-
 	/// <inheritdoc/>
 	public VulkanInfo? VulkanInfo { get; private set; }
 
@@ -36,6 +34,8 @@ internal sealed class VulkanDevice : IGraphicsDevice
 	/// <inheritdoc/>
 	public unsafe void Initialize(IWindow window)
 	{
+		Vk vk = Vk.GetApi();
+
 		if (window.VkSurface == null)
 			throw new ArgumentException("Window does not have a Vulkan surface.");
 
@@ -64,7 +64,7 @@ internal sealed class VulkanDevice : IGraphicsDevice
 				ExtDebugUtils.ExtensionName
 			];
 
-			if (Vk.IsLayerAvailable("VK_LAYER_KHRONOS_validation") == false)
+			if (vk.IsLayerAvailable("VK_LAYER_KHRONOS_validation") == false)
 				throw new Exception("Vulkan validation layer is not available."); // Hack
 
 			string[] instanceLayers =
@@ -88,16 +88,16 @@ internal sealed class VulkanDevice : IGraphicsDevice
 				PpEnabledLayerNames = instanceLayersPtr
 			};
 
-			Vk.CreateInstance(in instanceCreateInfo, null, out Instance instance).ThrowIfFailed();
-			Vk.CreateDebugCallback(in instance, (severity, type, message) => BerylConsole.Log($"[{severity}] [{type}] {message}", "Vulkan")).ThrowIfFailed();
-			Vk.SubmitDebugMessage(in instance, DebugUtilsMessageSeverityFlagsEXT.InfoBitExt, DebugUtilsMessageTypeFlagsEXT.GeneralBitExt, "Initialized Vulkan Debug callback.");
+			vk.CreateInstance(in instanceCreateInfo, null, out Instance instance).ThrowIfFailed();
+			vk.CreateDebugCallback(in instance, (severity, type, message) => BerylConsole.Log($"[{severity}] [{type}] {message}", "Vulkan")).ThrowIfFailed();
+			vk.SubmitDebugMessage(in instance, DebugUtilsMessageSeverityFlagsEXT.InfoBitExt, DebugUtilsMessageTypeFlagsEXT.GeneralBitExt, "Initialized Vulkan Debug callback.");
 
-			Vk.GetOptimalPhysicalDevice(in instance, out PhysicalDevice physDevice).ThrowIfFailed();
+			vk.GetOptimalPhysicalDevice(in instance, out PhysicalDevice physDevice).ThrowIfFailed();
 
-			Vk.GetWindowSurface(in instance, in window, out SurfaceKHR surface).ThrowIfFailed();
+			vk.GetWindowSurface(in instance, in window, out SurfaceKHR surface).ThrowIfFailed();
 
-			Vk.GetQueueFamilyIndex(in physDevice, QueueFlags.GraphicsBit, out uint graphicsFamilyIndex).ThrowIfFailed();
-			Vk.GetPresentQueueFamilyIndex(in instance, in physDevice, in surface, out uint presentFamilyIndex).ThrowIfFailed();
+			vk.GetQueueFamilyIndex(in physDevice, QueueFlags.GraphicsBit, out uint graphicsFamilyIndex).ThrowIfFailed();
+			vk.GetPresentQueueFamilyIndex(in instance, in physDevice, in surface, out uint presentFamilyIndex).ThrowIfFailed();
 
 			// Merge duplicates
 			// This is pretty yuck
@@ -146,21 +146,23 @@ internal sealed class VulkanDevice : IGraphicsDevice
 				PEnabledFeatures = &features
 			};
 
-			Vk.CreateDevice(physDevice, in deviceCreateInfo, null, out Device device).ThrowIfFailed();
+			vk.CreateDevice(physDevice, in deviceCreateInfo, null, out Device device).ThrowIfFailed();
 
-			Queue graphicsQueue = Vk.GetDeviceQueue(device, graphicsFamilyIndex, 0);
-			Queue presentQueue = Vk.GetDeviceQueue(device, presentFamilyIndex, 0);
+			Queue graphicsQueue = vk.GetDeviceQueue(device, graphicsFamilyIndex, 0);
+			Queue presentQueue = vk.GetDeviceQueue(device, presentFamilyIndex, 0);
 
 			SilkMarshal.Free((nint)instanceExtensionsPtr);
 			SilkMarshal.Free((nint)instanceLayersPtr);
 			SilkMarshal.Free((nint)deviceExtensionsPtr);
 
-			Vk.CreateOptimalSwapchain(in instance, in physDevice, in device, in surface, out SwapchainKHR swapchain, out SurfaceFormatKHR swapchainFormat, out Extent2D swapchainExtent).ThrowIfFailed();
-			Vk.GetSwapchainImages(in instance, in device, in swapchain, out Image[] images).ThrowIfFailed();
-			Vk.CreateSwapchainImageViews(in device, in images, in swapchainFormat.Format, out ImageView[] imageViews).ThrowIfFailed();
+			vk.CreateOptimalSwapchain(in instance, in physDevice, in device, in surface, out SwapchainKHR swapchain, out SurfaceFormatKHR swapchainFormat, out Extent2D swapchainExtent).ThrowIfFailed();
+			vk.GetSwapchainImages(in instance, in device, in swapchain, out Image[] images).ThrowIfFailed();
+			vk.CreateSwapchainImageViews(in device, in images, in swapchainFormat.Format, out ImageView[] imageViews).ThrowIfFailed();
 
 			VulkanInfo = new()
 			{
+				Vk = vk,
+
 				Instance = instance,
 				PhysicalDevice = physDevice,
 				Device = device,
@@ -201,11 +203,11 @@ internal sealed class VulkanDevice : IGraphicsDevice
 			return;
 
 		foreach (ImageView imageView in VulkanInfo.Value.SwapchainImageViews)
-			Vk.DestroyImageView(VulkanInfo.Value.Device, imageView, null);
+			VulkanInfo.Value.Vk.DestroyImageView(VulkanInfo.Value.Device, imageView, null);
 
-		Vk.DestroyDevice(VulkanInfo.Value.Device, null);
-		Vk.DestroyDebugCallback(VulkanInfo.Value.Instance);
-		Vk.DestroyInstance(VulkanInfo.Value.Instance, null);
-		Vk.Dispose();
+		VulkanInfo.Value.Vk.DestroyDevice(VulkanInfo.Value.Device, null);
+		VulkanInfo.Value.Vk.DestroyDebugCallback(VulkanInfo.Value.Instance);
+		VulkanInfo.Value.Vk.DestroyInstance(VulkanInfo.Value.Instance, null);
+		VulkanInfo.Value.Vk.Dispose();
 	}
 }
