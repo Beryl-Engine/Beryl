@@ -26,7 +26,12 @@ internal sealed class VulkanDevice : IGraphicsDevice
 	public IFramebuffer SwapchainFramebuffer => throw new NotImplementedException();
 
 	/// <inheritdoc/>
-	public IResourceFactory ResourceFactory => throw new NotImplementedException();
+	public IResourceFactory ResourceFactory { get; }
+
+	public VulkanDevice()
+	{
+		ResourceFactory = new VulkanResourceFactory(this);
+	}
 
 	/// <inheritdoc/>
 	public unsafe void Initialize(IWindow window)
