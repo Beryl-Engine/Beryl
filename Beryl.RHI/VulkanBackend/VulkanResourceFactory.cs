@@ -11,7 +11,7 @@ internal sealed class VulkanResourceFactory(VulkanDevice device) : IResourceFact
 	public IBuffer CreateBuffer(BufferDescriptor key) => throw new NotImplementedException();
 
 	/// <inheritdoc/>
-	public ICommandBuffer CreateCommandBuffer() => throw new NotImplementedException();
+	public ICommandBuffer CreateCommandBuffer() => new VulkanCommandBuffer(device.Vk);
 
 	/// <inheritdoc/>
 	public IPipeline CreateGraphicsPipeline(PipelineDescriptor key) => throw new NotImplementedException();
