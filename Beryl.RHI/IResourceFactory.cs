@@ -36,4 +36,7 @@ public interface IResourceFactory
 
 	/// <summary> Creates a new <see cref="IPipeline"/> using the given <see cref="PipelineDescriptor"/> information. </summary>
 	IPipeline CreateGraphicsPipeline(PipelineDescriptor key);
+
+	/// <summary> Creates a new <see cref="IComputePipeline"/> using the given <see cref="ComputePipelineDescriptor"/> information. </summary>
+	IComputePipeline CreateComputePipeline(ComputePipelineDescriptor key);
 }

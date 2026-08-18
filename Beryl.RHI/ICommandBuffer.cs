@@ -31,6 +31,9 @@ public interface ICommandBuffer : IDisposable
 	/// <summary> Sets the active pipeline. </summary>
 	void SetPipeline(IPipeline pipeline);
 
+	/// <summary> Sets the active compute pipeline. </summary>
+	void SetComputePipeline(IComputePipeline pipeline);
+
 	/// <summary> Sets a vertex buffer at the given slot. </summary>
 	void SetVertexBuffer(uint slot, IBuffer buffer);
 
@@ -39,6 +42,9 @@ public interface ICommandBuffer : IDisposable
 
 	/// <summary> Binds a graphics resource set to the given slot. </summary>
 	void SetGraphicsResourceSet(uint slot, IResourceSet resourceSet);
+
+	/// <summary> Binds a compute resource set to the given slot. </summary>
+	void SetComputeResourceSet(uint slot, IResourceSet resourceSet);
 	#endregion
 
 	#region Buffer Updates
@@ -49,6 +55,11 @@ public interface ICommandBuffer : IDisposable
 	#region Drawing
 	/// <summary> Draws indexed primitives. </summary>
 	void DrawIndexed(uint indexCount);
+	#endregion
+
+	#region Dispatching
+	/// <summary> Dispatches a compute job. </summary>
+	void Dispatch(uint x, uint y, uint z);
 	#endregion
 
 	#region Clearing

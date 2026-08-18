@@ -94,10 +94,7 @@ public class RenderingModule : BaseModule
 	/// <param name="transform">The object's transform matrix.</param>
 	public void QueueObject(IClientRenderable renderable, Matrix4x4 transform) => Renderables.Add((renderable, transform));
 
-	public void OnResize(int width, int height) => Resize((uint)width, (uint)height);
-
-	/// <summary> Resizes the renderer. </summary>
-	public void Resize(uint width, uint height) => Device.ResizeSwapchain(width, height);
+	public void OnResize(int width, int height) => Device.ResizeSwapchain((uint)width, (uint)height);
 
 	/// <summary> Submits the given <see cref="ICommandBuffer"/> to be ran. </summary>
 	public void SubmitCommandBuffer(ICommandBuffer commandBuffer) => Device.SubmitCommands(commandBuffer);

@@ -27,7 +27,7 @@
     <None Update="Assets\Beryl\Attributes.slang">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="Assets\Beryl\Debug.slang">
+    <None Update="Assets\Beryl\Compute.slang">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="Assets\Defaults\DummyLit.slang">

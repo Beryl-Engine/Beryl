@@ -35,6 +35,9 @@ internal sealed class VeldrithCommandBuffer : ICommandBuffer
 	public void SetPipeline(IPipeline pipeline) => CommandList.SetPipeline(((VeldrithPipeline)pipeline).Resource);
 
 	/// <inheritdoc/>
+	public void SetComputePipeline(IComputePipeline pipeline) => CommandList.SetPipeline(((VeldrithPipeline)pipeline).Resource);
+
+	/// <inheritdoc/>
 	public void SetVertexBuffer(uint slot, IBuffer buffer) => CommandList.SetVertexBuffer(slot, ((VeldrithBuffer)buffer).Resource);
 
 	/// <inheritdoc/>
@@ -44,10 +47,16 @@ internal sealed class VeldrithCommandBuffer : ICommandBuffer
 	public void SetGraphicsResourceSet(uint slot, IResourceSet resourceSet) => CommandList.SetGraphicsResourceSet(slot, ((VeldrithResourceSet)resourceSet).Resource);
 
 	/// <inheritdoc/>
+	public void SetComputeResourceSet(uint slot, IResourceSet resourceSet) => CommandList.SetComputeResourceSet(slot, ((VeldrithResourceSet)resourceSet).Resource);
+
+	/// <inheritdoc/>
 	public void UpdateBuffer(IBuffer buffer, uint offset, ReadOnlySpan<byte> data) => CommandList.UpdateBuffer(((VeldrithBuffer)buffer).Resource, offset, data);
 
 	/// <inheritdoc/>
 	public void DrawIndexed(uint indexCount) => CommandList.DrawIndexed(indexCount);
+
+	/// <inheritdoc/>
+	public void Dispatch(uint x, uint y, uint z) => CommandList.Dispatch(x, y, z);
 
 	/// <inheritdoc/>
 	public void SetFrameBuffer(IFramebuffer frameBuffer)

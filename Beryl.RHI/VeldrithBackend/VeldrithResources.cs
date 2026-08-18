@@ -74,7 +74,7 @@ internal sealed class VeldrithResourceSet(ResourceSet resource) : IResourceSet
 	public void Dispose() => Resource.Dispose();
 }
 
-internal sealed class VeldrithPipeline(Pipeline resource) : IPipeline
+internal sealed class VeldrithPipeline(Pipeline resource) : IPipeline, IComputePipeline
 {
 	internal Pipeline Resource { get; } = resource;
 

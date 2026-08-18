@@ -14,9 +14,13 @@ internal sealed class VeldrithResourceFactory(VeldrithDevice device) : IResource
 	/// <inheritdoc/>
 	public IShader CreateShader(ShaderDescriptor key)
 	{
-		Veldrith.ShaderStages stage = key.Stage == Resources.ShaderStages.Vertex
-			? Veldrith.ShaderStages.Vertex
-			: Veldrith.ShaderStages.Fragment;
+		Veldrith.ShaderStages stage = key.Stage switch
+		{
+			Resources.ShaderStages.Vertex => Veldrith.ShaderStages.Vertex,
+			Resources.ShaderStages.Fragment => Veldrith.ShaderStages.Fragment,
+			Resources.ShaderStages.Compute => Veldrith.ShaderStages.Compute,
+			_ => throw new NotSupportedException($"Shader stage '{key.Stage}' is not supported.")
+		};
 
 		var description = new ShaderDescription(stage, key.Bytecode.ToArray(), "main");
 		return new VeldrithResources(device.GraphicsDevice.ResourceFactory.CreateShader(description));
@@ -124,6 +128,22 @@ internal sealed class VeldrithResourceFactory(VeldrithDevice device) : IResource
 		return new VeldrithPipeline(device.GraphicsDevice.ResourceFactory.CreateGraphicsPipeline(ref description));
 	}
 
+	/// <inheritdoc/>
+	public IComputePipeline CreateComputePipeline(ComputePipelineDescriptor key)
+	{
+		ResourceLayout[] layouts = key.ResourceGroups.ToArray()
+			.Select(group => ((VeldrithResourceLayout)CreateResourceLayout(new ResourceLayoutDescriptor(group.LayoutElements.AsSpan()))).Resource)
+			.ToArray();
+		var description = new ComputePipelineDescription(
+			((VeldrithResources)CreateShader(key.Shader)).Resource,
+			layouts,
+			1,
+			1,
+			1);
+
+		return new VeldrithPipeline(device.GraphicsDevice.ResourceFactory.CreateComputePipeline(ref description));
+	}
+
 	private static Veldrith.BufferUsage ToVeldrith(Resources.BufferUsage usage)
 	{
 		Veldrith.BufferUsage result = 0;
@@ -148,6 +168,8 @@ internal sealed class VeldrithResourceFactory(VeldrithDevice device) : IResource
 			result |= Veldrith.ShaderStages.Vertex;
 		if (stages.HasFlag(Resources.ShaderStages.Fragment))
 			result |= Veldrith.ShaderStages.Fragment;
+		if (stages.HasFlag(Resources.ShaderStages.Compute))
+			result |= Veldrith.ShaderStages.Compute;
 
 		return result;
 	}

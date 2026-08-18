@@ -8,6 +8,7 @@ using Beryl.Input.Devices;
 using Beryl.Math;
 using Beryl.Physics;
 using Beryl.Rendering.Components;
+using Beryl.Rendering.Resources;
 using Beryl.Scenes.Entities;
 
 namespace Beryl.Rendering.Entities;

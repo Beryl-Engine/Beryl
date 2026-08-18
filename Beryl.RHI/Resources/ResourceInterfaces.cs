@@ -53,6 +53,11 @@ public interface IResourceSet : IGPUResource { }
 public interface IPipeline : IGPUResource { }
 
 /// <summary>
+/// A compute pipeline.
+/// </summary>
+public interface IComputePipeline : IGPUResource { }
+
+/// <summary>
 /// A GPU resource that can be bound to a shader.
 /// </summary>
 public interface IBindableResource : IGPUResource { }

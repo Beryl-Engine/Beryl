@@ -1,8 +1,11 @@
 // This file is part of the Beryl Game Engine.
 // Licensed under the MIT license. (https://github.com/Beryl-Engine/Beryl/blob/main/LICENSE)
 
+using Beryl.Common;
 using Beryl.Common.Resources.DefaultProvider;
+using Beryl.Common.Standard;
 using Beryl.Common.Utility;
+using Beryl.Rendering.Resources.Caches;
 using Beryl.RHI;
 using Beryl.RHI.Resources;
 using SlangShaderSharp;
@@ -181,6 +184,54 @@ public class Shader
 	{
 		Name = name;
 		Source = source;
+	}
+
+	/// <summary> Runs a compute dispatch. </summary>
+	public void Dispatch(uint x, uint y, uint z, Action? onComplete = null)
+	{
+		if (!StageBytecode.TryGetValue(ShaderStages.Compute, out byte[]? bytecode))
+			return;
+
+		ShaderDescriptor shaderDescriptor = new(bytecode, ShaderStages.Compute);
+		ComputePipelineDescriptor pipelineDescriptor = new(shaderDescriptor, ResourceGroups.AsSpan());
+		FrameCountedResource<IComputePipeline> pipeline = ComputePipelineCache.Instance.GetOrCreate(pipelineDescriptor);
+
+		using var commandBuffer = CommandBufferPool.Shared.RentAuto();
+		commandBuffer.Object.Begin();
+
+		commandBuffer.Object.SetComputePipeline(pipeline.Resource);
+		BindComputeResources(commandBuffer.Object);
+
+		commandBuffer.Object.Dispatch(x, y, z);
+
+		commandBuffer.Object.End();
+
+		ModuleManager.GetModule<RenderingModule>()?.SubmitCommandBuffer(commandBuffer.Object);
+
+		onComplete?.Invoke();
+	}
+
+	private void BindComputeResources(ICommandBuffer cmd)
+	{
+		foreach (var group in ResourceGroups)
+		{
+			using RentedArray<IBindableResource> boundResources = new(group.Resources.Length);
+
+			int index = 0;
+
+			foreach (var resource in group.Resources)
+			{
+				var key = new NamedBufferDescriptor(resource.Name, resource.SizeInBytes, BufferUsage.UniformBuffer | BufferUsage.Dynamic);
+				FrameCountedResource<IBuffer> buffer = NamedBufferCache.Instance.GetOrCreate(key);
+				boundResources.Array[index++] = buffer.Resource;
+			}
+
+			var layout = ResourceLayoutCache.Instance.GetOrCreate(new ResourceLayoutDescriptor(group.LayoutElements.AsSpan()));
+			var setKey = new ResourceDescriptor(layout.Resource, boundResources.Array.AsSpan(0, index));
+			var set = ResourceSetCache.Instance.GetOrCreate(setKey);
+
+			cmd.SetComputeResourceSet(group.Set, set.Resource);
+		}
 	}
 
 	private static ShaderStages ToShaderStage(SlangStage stage) => stage switch

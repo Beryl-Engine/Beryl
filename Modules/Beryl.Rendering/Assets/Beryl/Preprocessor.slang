@@ -1,8 +1,6 @@
 // Preprocessor.slang
 // Provides macros and definitions that can be included by Beryl shaders.
 
-module Preprocessor;
-
 // -----------------------------------------------------------------------------
 // Macros.
 // -----------------------------------------------------------------------------

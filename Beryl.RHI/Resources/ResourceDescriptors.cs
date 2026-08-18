@@ -48,6 +48,30 @@ public readonly ref struct DepthInfo(bool writeDepth = true, ComparisonMode dept
 	}
 }
 
+public readonly ref struct ComputePipelineDescriptor(ShaderDescriptor shader, ReadOnlySpan<ShaderResourceGroup> resourceGroups) : IAlwaysHashable
+{
+	public readonly ShaderDescriptor Shader = shader;
+	public readonly ReadOnlySpan<ShaderResourceGroup> ResourceGroups = resourceGroups;
+
+	/// <inheritdoc/>
+	public override int GetHashCode()
+	{
+		var hash = new HashCode();
+		hash.Add(Shader.GetHashCode());
+		foreach (ref readonly var group in ResourceGroups)
+		{
+			hash.Add(group.Set);
+			foreach (var element in group.LayoutElements)
+			{
+				hash.Add(element.Name);
+				hash.Add(element.Kind);
+				hash.Add(element.Stages);
+			}
+		}
+		return hash.ToHashCode();
+	}
+}
+
 public readonly ref struct PipelineDescriptor(string passName, ShaderDescriptor vertShader, ShaderDescriptor fragShader, IFramebuffer output, ReadOnlySpan<ShaderResourceGroup> resourceGroups, CullingMode cullingMode = CullingMode.Back, DepthInfo depthInfo = default) : IAlwaysHashable
 {
 	public readonly string PassName = passName;

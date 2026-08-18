@@ -47,6 +47,10 @@ internal sealed class Program
 			cube.RigidBody.Colliders.Add(new BoxCollider(1, 1, 1));
 
 			ModuleManager.GetModule<SceneModule>()?.CurrentScene.StartAll();
+
+			// Compute some gpu stuff
+			Shader compute = Application.ResourceProvider.GetResource<Shader>("Assets/Beryl/Compute.slang") ?? throw new Exception("Failed to load shader");
+			compute.Dispatch(1, 1, 1);
 		};
 
 		Application.OnExit += () =>
