@@ -14,7 +14,9 @@ public readonly struct VulkanInfo
 	public PhysicalDevice PhysicalDevice { get; init; }
 	public Device Device { get; init; }
 	public SurfaceKHR Surface { get; init; }
+
 	public SwapchainKHR Swapchain { get; init; }
+	public ImageView[] SwapchainImageViews { get; init; } // move?
 
 	public uint GraphicsQueueFamilyIndex { get; init; }
 	public Queue GraphicsQueue { get; init; }

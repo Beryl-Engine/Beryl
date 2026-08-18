@@ -215,7 +215,7 @@ internal static class VulkanExtensions
 				return khrSurface.GetPhysicalDeviceSurfaceFormats(physDevice, surface, &formatCount, pFormats);
 		}
 
-		/// <summary> Gets the images belonging to a swapchain. </summary>
+		/// <summary> Gets the <see cref="Image"/>s belonging to a swapchain. </summary>
 		public unsafe Result GetSwapchainImages(in Instance instance, in Device device, in SwapchainKHR swapchain, out Image[] images)
 		{
 			if (vk.TryGetDeviceExtension<KhrSwapchain>(instance, device, out var khrSwapchain) == false)
@@ -232,7 +232,48 @@ internal static class VulkanExtensions
 				return khrSwapchain.GetSwapchainImages(device, swapchain, &imageCount, pImages);
 		}
 
-		/// <summary> Creates an optimal swapchain for the given physical device and surface. </summary>
+		/// <summary> Creates swapchain-compatible <see cref="ImageView"/>s for a set of <see cref="Image"/>s. </summary>
+		public unsafe Result CreateSwapchainImageViews(in Device device, in Image[] images, in Format format, out ImageView[] imageViews)
+		{
+			imageViews = new ImageView[images.Length];
+
+			for (int i = 0; i < images.Length; i++)
+			{
+				ImageViewCreateInfo createInfo = new()
+				{
+					SType = StructureType.ImageViewCreateInfo,
+
+					Image = images[i],
+					ViewType = ImageViewType.Type2D,
+					Format = format,
+
+					Components = new ComponentMapping
+					{
+						R = ComponentSwizzle.Identity,
+						G = ComponentSwizzle.Identity,
+						B = ComponentSwizzle.Identity,
+						A = ComponentSwizzle.Identity
+					},
+
+					SubresourceRange = new ImageSubresourceRange
+					{
+						AspectMask = ImageAspectFlags.ColorBit,
+						BaseMipLevel = 0,
+						LevelCount = 1,
+						BaseArrayLayer = 0,
+						LayerCount = 1
+					}
+				};
+
+				Result result = vk.CreateImageView(device, in createInfo, null, out imageViews[i]);
+				if (result != Result.Success)
+					return result;
+			}
+
+			return Result.Success;
+		}
+
+		/// <summary> Creates an optimal <see cref="SwapchainKHR"/> for the given physical device and surface. </summary>
 		public unsafe Result CreateOptimalSwapchain(in Instance instance, in PhysicalDevice physDevice, in Device device, in SurfaceKHR surface, out SwapchainKHR swapchain, out SurfaceFormatKHR swapchainFormat, out Extent2D swapchainExtent)
 		{
 			swapchain = default;

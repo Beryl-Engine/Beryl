@@ -157,6 +157,7 @@ internal sealed class VulkanDevice : IGraphicsDevice
 
 			Vk.CreateOptimalSwapchain(in instance, in physDevice, in device, in surface, out SwapchainKHR swapchain, out SurfaceFormatKHR swapchainFormat, out Extent2D swapchainExtent).ThrowIfFailed();
 			Vk.GetSwapchainImages(in instance, in device, in swapchain, out Image[] images).ThrowIfFailed();
+			Vk.CreateSwapchainImageViews(in device, in images, in swapchainFormat.Format, out ImageView[] imageViews).ThrowIfFailed();
 
 			VulkanInfo = new()
 			{
@@ -164,7 +165,9 @@ internal sealed class VulkanDevice : IGraphicsDevice
 				PhysicalDevice = physDevice,
 				Device = device,
 				Surface = surface,
+
 				Swapchain = swapchain,
+				SwapchainImageViews = imageViews,
 
 				GraphicsQueueFamilyIndex = graphicsFamilyIndex,
 				GraphicsQueue = graphicsQueue,
@@ -196,6 +199,9 @@ internal sealed class VulkanDevice : IGraphicsDevice
 	{
 		if (VulkanInfo == null)
 			return;
+
+		foreach (ImageView imageView in VulkanInfo.Value.SwapchainImageViews)
+			Vk.DestroyImageView(VulkanInfo.Value.Device, imageView, null);
 
 		Vk.DestroyDevice(VulkanInfo.Value.Device, null);
 		Vk.DestroyDebugCallback(VulkanInfo.Value.Instance);
