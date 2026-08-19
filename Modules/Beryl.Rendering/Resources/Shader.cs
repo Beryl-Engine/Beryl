@@ -186,7 +186,7 @@ public class Shader
 	}
 
 	/// <summary> Runs a compute dispatch. </summary>
-	public void Dispatch(uint x, uint y, uint z)
+	public void Dispatch(uint x, uint y, uint z, GPUBuffer? parameterBuffer = null)
 	{
 		if (!StageBytecode.TryGetValue(ShaderStages.Compute, out byte[]? bytecode))
 			return;
@@ -198,6 +198,9 @@ public class Shader
 		using var commandBuffer = CommandBufferPool.Shared.RentAuto();
 
 		commandBuffer.Object.Begin();
+
+		if (parameterBuffer != null)
+			commandBuffer.Object.SetConstantBuffer("Parameters", parameterBuffer.Data);
 
 		commandBuffer.Object.SetComputePipeline(pipeline.Resource);
 		commandBuffer.Object.BindShaderResources(this, true);

@@ -48,8 +48,11 @@ internal sealed class Program
 
 			ModuleManager.GetModule<SceneModule>()?.CurrentScene.StartAll();
 
+			using var buffer = GPUBufferPool.Shared.RentAuto();
+			buffer.Object.AddInt(10);
+
 			Shader? compute = Application.ResourceProvider.GetResource<Shader>("Assets/Beryl/Compute.slang");
-			compute?.Dispatch(1, 1, 1);
+			compute?.Dispatch(1, 1, 1, buffer);
 		};
 
 		Application.OnExit += () =>
