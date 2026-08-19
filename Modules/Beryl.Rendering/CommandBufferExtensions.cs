@@ -33,6 +33,39 @@ public static class CommandBufferExtensions
 			cmd.UpdateBuffer(buffer.Resource, 0, data);
 		}
 
+		/// <summary> Binds a shader's resources. </summary>
+		public void BindShaderResources(Shader shader, bool compute = false)
+		{
+			foreach (var group in shader.ResourceGroups)
+			{
+				using RentedArray<IBindableResource> boundResources = new(group.Resources.Length);
+
+				int index = 0;
+
+				foreach (var resource in group.Resources)
+				{
+					var buffer = NamedBufferCache.Instance.Get(new NamedBufferDescriptor(resource.Name, resource.SizeInBytes, BufferUsage.UniformBuffer | BufferUsage.Dynamic));
+					if (buffer?.Resource == null)
+					{
+						BerylConsole.Warning($"Could not find constant buffer '{resource.Name}'.");
+						buffer = NamedBufferCache.Instance.GetOrCreate(new NamedBufferDescriptor(resource.Name, resource.SizeInBytes, BufferUsage.UniformBuffer | BufferUsage.Dynamic));
+					}
+
+					boundResources.Array[index++] = buffer.Resource;
+				}
+
+				var layout = ResourceLayoutCache.Instance.GetOrCreate(new ResourceLayoutDescriptor(group.LayoutElements.AsSpan()));
+
+				var setKey = new ResourceDescriptor(layout.Resource, boundResources.Array.AsSpan(0, index));
+				var set = ResourceSetCache.Instance.GetOrCreate(setKey);
+
+				if (compute)
+					cmd.SetComputeResourceSet(group.Set, set.Resource);
+				else
+					cmd.SetGraphicsResourceSet(group.Set, set.Resource);
+			}
+		}
+
 
 		/// <summary> Draws a mesh. </summary>
 		public void DrawImmediate(ReadOnlySpan<Vector3> vertices, ReadOnlySpan<Vector3> normals, ReadOnlySpan<Vector2> uvs, ReadOnlySpan<uint> indices, Matrix4x4 transform, Material material)
@@ -69,35 +102,5 @@ public static class CommandBufferExtensions
 
 		/// <summary> Draws a <see cref="IClientRenderable"/> with the given transform <see cref="Matrix4x4"/> and <see cref="Material"/>. </summary>
 		public void DrawImmediate(IClientRenderable renderable, Matrix4x4 transform) => cmd.DrawImmediate(renderable.Vertices, renderable.Normals, renderable.UVs, renderable.Indices, transform, renderable.Material);
-	}
-
-	private static void BindShaderResources(ICommandBuffer cmd, Shader shader)
-	{
-		foreach (var group in shader.ResourceGroups)
-		{
-			using RentedArray<IBindableResource> boundResources = new(group.Resources.Length);
-
-			int index = 0;
-
-			foreach (var resource in group.Resources)
-			{
-				var buffer = NamedBufferCache.Instance.Get(new NamedBufferDescriptor(resource.Name, resource.SizeInBytes, BufferUsage.UniformBuffer | BufferUsage.Dynamic));
-				if (buffer?.Resource == null)
-				{
-					BerylConsole.Warning($"Could not find constant buffer '{resource.Name}'.");
-					index++;
-					continue;
-				}
-
-				boundResources.Array[index++] = buffer.Resource;
-			}
-
-			var layout = ResourceLayoutCache.Instance.GetOrCreate(new ResourceLayoutDescriptor(group.LayoutElements.AsSpan()));
-
-			var setKey = new ResourceDescriptor(layout.Resource, boundResources.Array.AsSpan(0, index));
-			var set = ResourceSetCache.Instance.GetOrCreate(setKey);
-
-			cmd.SetGraphicsResourceSet(group.Set, set.Resource);
-		}
 	}
 }

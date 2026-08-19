@@ -3,7 +3,6 @@
 
 using Beryl.Common;
 using Beryl.Common.Resources.DefaultProvider;
-using Beryl.Common.Standard;
 using Beryl.Common.Utility;
 using Beryl.Rendering.Resources.Caches;
 using Beryl.RHI;
@@ -143,7 +142,7 @@ public class Shader
 
 			Resources = resources.OrderBy(r => r.Set).ThenBy(r => r.Binding).ToImmutableArray();
 
-			var layouts = Resources.Select(r => new ResourceLayoutElementDescription(r.Name, r.Kind, ShaderStages.Vertex | ShaderStages.Fragment)).ToImmutableArray();
+			var layouts = Resources.Select(r => new ResourceLayoutElementDescription(r.Name, r.Kind, ShaderStages.Vertex | ShaderStages.Fragment | ShaderStages.Compute)).ToImmutableArray();
 
 			ResourceGroups = Resources
 				.GroupBy(r => r.Set)
@@ -197,39 +196,17 @@ public class Shader
 		FrameCountedResource<IComputePipeline> pipeline = ComputePipelineCache.Instance.GetOrCreate(pipelineDescriptor);
 
 		using var commandBuffer = CommandBufferPool.Shared.RentAuto();
+
 		commandBuffer.Object.Begin();
 
 		commandBuffer.Object.SetComputePipeline(pipeline.Resource);
-		BindComputeResources(commandBuffer.Object);
+		commandBuffer.Object.BindShaderResources(this, true);
 
 		commandBuffer.Object.Dispatch(x, y, z);
 
 		commandBuffer.Object.End();
 
 		ModuleManager.GetModule<RenderingModule>()?.SubmitCommandBuffer(commandBuffer.Object);
-	}
-
-	private void BindComputeResources(ICommandBuffer cmd)
-	{
-		foreach (var group in ResourceGroups)
-		{
-			using RentedArray<IBindableResource> boundResources = new(group.Resources.Length);
-
-			int index = 0;
-
-			foreach (var resource in group.Resources)
-			{
-				var key = new NamedBufferDescriptor(resource.Name, resource.SizeInBytes, BufferUsage.UniformBuffer | BufferUsage.Dynamic);
-				FrameCountedResource<IBuffer> buffer = NamedBufferCache.Instance.GetOrCreate(key);
-				boundResources.Array[index++] = buffer.Resource;
-			}
-
-			var layout = ResourceLayoutCache.Instance.GetOrCreate(new ResourceLayoutDescriptor(group.LayoutElements.AsSpan()));
-			var setKey = new ResourceDescriptor(layout.Resource, boundResources.Array.AsSpan(0, index));
-			var set = ResourceSetCache.Instance.GetOrCreate(setKey);
-
-			cmd.SetComputeResourceSet(group.Set, set.Resource);
-		}
 	}
 
 	private static ShaderStages ToShaderStage(SlangStage stage) => stage switch

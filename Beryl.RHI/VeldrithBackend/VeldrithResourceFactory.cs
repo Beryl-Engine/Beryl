@@ -45,6 +45,7 @@ internal sealed class VeldrithResourceFactory(VeldrithDevice device) : IResource
 			PixelFormat.R8G8B8A8UNorm,
 			TextureUsage.Sampled,
 			TextureType.Texture2D);
+
 		Texture texture = device.GraphicsDevice.ResourceFactory.CreateTexture(description);
 
 		device.GraphicsDevice.UpdateTexture(texture, key.Data, 0, 0, 0, key.Width, key.Height, 1, 0, 0);
@@ -104,16 +105,15 @@ internal sealed class VeldrithResourceFactory(VeldrithDevice device) : IResource
 	/// <inheritdoc/>
 	public IPipeline CreateGraphicsPipeline(PipelineDescriptor key)
 	{
-		ResourceLayout[] layouts = key.ResourceGroups.ToArray()
-			.Select(group => ((VeldrithResourceLayout)CreateResourceLayout(new ResourceLayoutDescriptor(group.LayoutElements.AsSpan()))).Resource)
-			.ToArray();
+		ResourceLayout[] layouts = key.ResourceGroups.ToArray().Select(group => ((VeldrithResourceLayout)CreateResourceLayout(new ResourceLayoutDescriptor(group.LayoutElements.AsSpan()))).Resource).ToArray();
+
 		var vertexLayout = new VertexLayoutDescription(
 			new VertexElementDescription("POSITION", VertexElementSemantic.Position, VertexElementFormat.Float3),
 			new VertexElementDescription("NORMAL", VertexElementSemantic.Normal, VertexElementFormat.Float3),
 			new VertexElementDescription("TEXCOORD0", VertexElementSemantic.TextureCoordinate, VertexElementFormat.Float2));
-		var shaderSet = new ShaderSetDescription(
-			[vertexLayout],
-			[((VeldrithResources)CreateShader(key.VertShader)).Resource, ((VeldrithResources)CreateShader(key.FragShader)).Resource]);
+
+		var shaderSet = new ShaderSetDescription([vertexLayout], [((VeldrithResources)CreateShader(key.VertShader)).Resource, ((VeldrithResources)CreateShader(key.FragShader)).Resource]);
+
 		var description = new GraphicsPipelineDescription
 		{
 			BlendState = BlendStateDescription.SINGLE_OVERRIDE_BLEND,
@@ -131,9 +131,8 @@ internal sealed class VeldrithResourceFactory(VeldrithDevice device) : IResource
 	/// <inheritdoc/>
 	public IComputePipeline CreateComputePipeline(ComputePipelineDescriptor key)
 	{
-		ResourceLayout[] layouts = key.ResourceGroups.ToArray()
-			.Select(group => ((VeldrithResourceLayout)CreateResourceLayout(new ResourceLayoutDescriptor(group.LayoutElements.AsSpan()))).Resource)
-			.ToArray();
+		ResourceLayout[] layouts = key.ResourceGroups.ToArray().Select(group => ((VeldrithResourceLayout)CreateResourceLayout(new ResourceLayoutDescriptor(group.LayoutElements.AsSpan()))).Resource).ToArray();
+
 		var description = new ComputePipelineDescription(
 			((VeldrithResources)CreateShader(key.Shader)).Resource,
 			layouts,
@@ -150,10 +149,13 @@ internal sealed class VeldrithResourceFactory(VeldrithDevice device) : IResource
 
 		if (usage.HasFlag(Resources.BufferUsage.VertexBuffer))
 			result |= Veldrith.BufferUsage.VertexBuffer;
+
 		if (usage.HasFlag(Resources.BufferUsage.IndexBuffer))
 			result |= Veldrith.BufferUsage.IndexBuffer;
+
 		if (usage.HasFlag(Resources.BufferUsage.UniformBuffer))
 			result |= Veldrith.BufferUsage.UniformBuffer;
+
 		if (usage.HasFlag(Resources.BufferUsage.Dynamic))
 			result |= Veldrith.BufferUsage.Dynamic;
 
@@ -166,8 +168,10 @@ internal sealed class VeldrithResourceFactory(VeldrithDevice device) : IResource
 
 		if (stages.HasFlag(Resources.ShaderStages.Vertex))
 			result |= Veldrith.ShaderStages.Vertex;
+
 		if (stages.HasFlag(Resources.ShaderStages.Fragment))
 			result |= Veldrith.ShaderStages.Fragment;
+
 		if (stages.HasFlag(Resources.ShaderStages.Compute))
 			result |= Veldrith.ShaderStages.Compute;
 
