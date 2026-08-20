@@ -185,8 +185,8 @@ public class Shader
 		Source = source;
 	}
 
-	/// <summary> Runs a compute dispatch. </summary>
-	public void Dispatch(uint x, uint y, uint z, GPUBuffer? parameterBuffer = null)
+	/// <summary> Queues this shader's compute stage for dispatching. </summary>
+	public void EnqueueDispatch(uint x, uint y, uint z, GPUBuffer? parameterBuffer = null)
 	{
 		if (!StageBytecode.TryGetValue(ShaderStages.Compute, out byte[]? bytecode))
 			return;

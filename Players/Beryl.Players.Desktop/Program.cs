@@ -52,7 +52,7 @@ internal sealed class Program
 			buffer.Object.AddInt(10);
 
 			Shader? compute = Application.ResourceProvider.GetResource<Shader>("Assets/Beryl/Compute.slang");
-			compute?.Dispatch(1, 1, 1, buffer);
+			compute?.EnqueueDispatch(1, 1, 1, buffer);
 		};
 
 		Application.OnExit += () =>
