@@ -12,6 +12,10 @@ namespace Beryl.RHI.WebGPUBackend;
 
 internal sealed class WebGPUDevice : IGraphicsDevice
 {
+	internal Surface Surface { get; private set; } = null!;
+	internal Instance Instance { get; private set; } = null!;
+	internal Device Device { get; private set; } = null!;
+
 	/// <inheritdoc/>
 	public VulkanInfo? VulkanInfo { get; private set; }
 
@@ -24,10 +28,6 @@ internal sealed class WebGPUDevice : IGraphicsDevice
 	/// <inheritdoc/>
 	public IResourceFactory ResourceFactory { get; }
 
-	private Surface? surface;
-	private Instance? instance;
-	private Device? device;
-
 	private readonly RendererBackend backend;
 
 	public WebGPUDevice(RendererBackend backend)
@@ -39,12 +39,12 @@ internal sealed class WebGPUDevice : IGraphicsDevice
 	/// <inheritdoc/>
 	public void Initialize(IWindow window)
 	{
-		instance = WebGPU.CreateInstance();
-		if (instance == null)
+		Instance = WebGPU.CreateInstance();
+		if (Instance == null)
 			throw new Exception("Failed to create WebGPU instance.");
 
-		surface = CreateSurface(window.Native, instance);
-		if (surface == null)
+		Surface = CreateSurface(window.Native, Instance);
+		if (Surface == null)
 			throw new Exception("Failed to create surface for window.");
 
 		BackendType backendType = BackendType.Undefined;
@@ -60,13 +60,13 @@ internal sealed class WebGPUDevice : IGraphicsDevice
 
 		RequestAdapterOptions adapterOptions = new()
 		{
-			CompatibleSurface = surface,
+			CompatibleSurface = Surface,
 			PowerPreference = PowerPreference.HighPerformance,
 
 			BackendType = backendType
 		};
 
-		instance.RequestAdapter(in adapterOptions, (adapterStatus, adapter, bytes) =>
+		Instance.RequestAdapter(in adapterOptions, (adapterStatus, adapter, bytes) =>
 		{
 			if (adapterStatus != RequestAdapterStatus.Success || adapter == null)
 				throw new Exception("Failed to create WebGPU adapter.");
@@ -80,11 +80,11 @@ internal sealed class WebGPUDevice : IGraphicsDevice
 				if (deviceStatus != RequestDeviceStatus.Success || device == null)
 					throw new Exception("Failed to create WebGPU device.");
 
-				this.device = device;
+				Device = device;
 
-				surface.Configure(new SurfaceConfiguration()
+				Surface.Configure(new SurfaceConfiguration()
 				{
-					Device = this.device,
+					Device = Device,
 					Format = WebGpuSharp.TextureFormat.BGRA8Unorm,
 					Width = (uint)window.Size.X,
 					Height = (uint)window.Size.Y,
@@ -98,12 +98,12 @@ internal sealed class WebGPUDevice : IGraphicsDevice
 	/// <inheritdoc/>
 	public void ResizeSwapchain(uint width, uint height)
 	{
-		if (surface == null || device == null)
+		if (Surface == null || Device == null)
 			return;
 
-		surface.Configure(new SurfaceConfiguration()
+		Surface.Configure(new SurfaceConfiguration()
 		{
-			Device = device,
+			Device = Device,
 			Format = WebGpuSharp.TextureFormat.BGRA8Unorm,
 			Width = width,
 			Height = height,
@@ -116,7 +116,7 @@ internal sealed class WebGPUDevice : IGraphicsDevice
 	public void SubmitCommands(ICommandBuffer buffer) => throw new NotImplementedException();
 
 	/// <inheritdoc/>
-	public void SwapBuffers() => surface?.Present();
+	public void SwapBuffers() => Surface?.Present();
 
 	/// <inheritdoc/>
 	public void UpdateBuffer<T>(IBuffer buffer, uint offset, ReadOnlySpan<T> data) where T : unmanaged => throw new NotImplementedException();
