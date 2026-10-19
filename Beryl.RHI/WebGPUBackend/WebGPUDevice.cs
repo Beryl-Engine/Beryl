@@ -49,26 +49,6 @@ internal sealed class WebGPUDevice : IGraphicsDevice
 		SwapchainFramebuffer = new WebGPUFramebuffer(this);
 	}
 
-	internal static bool IsBackendSupported(RendererBackend backend)
-	{
-		if (backend is not (RendererBackend.Vulkan or RendererBackend.Direct3D12))
-			return false;
-
-		try
-		{
-			var instance = WebGPU.CreateInstance();
-			return instance?.RequestAdapterSync(new RequestAdapterOptions
-			{
-				CompatibleSurface = null!,
-				BackendType = backend == RendererBackend.Vulkan ? BackendType.Vulkan : BackendType.D3D12
-			}) != null;
-		}
-		catch (Exception)
-		{
-			return false;
-		}
-	}
-
 	/// <inheritdoc/>
 	public void Initialize(IWindow window)
 	{
