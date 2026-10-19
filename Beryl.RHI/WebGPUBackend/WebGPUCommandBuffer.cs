@@ -24,6 +24,8 @@ internal sealed class WebGPUCommandBuffer(WebGPUDevice device) : ICommandBuffer
 	private readonly Dictionary<uint, WebGPUBuffer> vertexBuffers = [];
 	private readonly Dictionary<uint, WebGPUResourceSet> graphicsSets = [];
 	private readonly Dictionary<uint, WebGPUResourceSet> computeSets = [];
+	private readonly List<UploadBuffer> uploadBuffers = [];
+	private int uploadBufferIndex;
 
 	/// <inheritdoc/>
 	public IFramebuffer? CurrentFramebuffer => target;
@@ -44,6 +46,11 @@ internal sealed class WebGPUCommandBuffer(WebGPUDevice device) : ICommandBuffer
 		vertexBuffers.Clear();
 		graphicsSets.Clear();
 		computeSets.Clear();
+		uploadBufferIndex = 0;
+
+		foreach (var upload in uploadBuffers)
+			upload.Length = 0;
+
 		encoder = device.Device.CreateCommandEncoder();
 		recording = true;
 	}
@@ -53,6 +60,7 @@ internal sealed class WebGPUCommandBuffer(WebGPUDevice device) : ICommandBuffer
 	{
 		EnsureRecording();
 		EndPass();
+
 		commands = encoder.Finish();
 		encoder = default;
 		recording = false;
@@ -64,6 +72,12 @@ internal sealed class WebGPUCommandBuffer(WebGPUDevice device) : ICommandBuffer
 		ObjectDisposedException.ThrowIf(disposed, this);
 		if (!finished)
 			throw new InvalidOperationException("End the command buffer before submitting it.");
+
+		foreach (var upload in uploadBuffers)
+		{
+			if (upload.Length != 0)
+				device.Queue.WriteBuffer(upload.Resource, 0, upload.Data.AsSpan(0, upload.Length));
+		}
 
 		device.Queue.Submit(commands);
 		commands = default;
@@ -150,16 +164,32 @@ internal sealed class WebGPUCommandBuffer(WebGPUDevice device) : ICommandBuffer
 			return;
 
 		EndPass();
-		var staging = device.Device.CreateBuffer(new WebGpuSharp.BufferDescriptor
-		{
-			Size = (ulong)data.Length,
-			Usage = WebGpuSharp.BufferUsage.CopySrc,
-			MappedAtCreation = true
-		});
+		var upload = GetUploadBuffer(data.Length);
+		int sourceOffset = upload.Length;
+		data.CopyTo(upload.Data.AsSpan(sourceOffset));
+		upload.Length += data.Length;
+		encoder.CopyBufferToBuffer(upload.Resource, (ulong)sourceOffset, destination.Resource, offset, (ulong)data.Length);
+	}
 
-		staging.GetMappedRange<byte, ReadOnlySpan<byte>>(0, (nuint)data.Length, static (mapped, source) => source.CopyTo(mapped), data);
-		staging.Unmap();
-		encoder.CopyBufferToBuffer(staging, 0, destination.Resource, offset, (ulong)data.Length);
+	private UploadBuffer GetUploadBuffer(int length)
+	{
+		while (uploadBufferIndex < uploadBuffers.Count)
+		{
+			var upload = uploadBuffers[uploadBufferIndex];
+			if (upload.Data.Length - upload.Length >= length)
+				return upload;
+			uploadBufferIndex++;
+		}
+
+		int capacity = System.Math.Max(64 * 1024, length);
+		var resource = device.Device.CreateBuffer(new WebGpuSharp.BufferDescriptor
+		{
+			Size = (ulong)capacity,
+			Usage = WebGpuSharp.BufferUsage.CopySrc | WebGpuSharp.BufferUsage.CopyDst
+		});
+		var buffer = new UploadBuffer(resource, capacity);
+		uploadBuffers.Add(buffer);
+		return buffer;
 	}
 
 	/// <inheritdoc/>
@@ -289,8 +319,20 @@ internal sealed class WebGPUCommandBuffer(WebGPUDevice device) : ICommandBuffer
 		vertexBuffers.Clear();
 		graphicsSets.Clear();
 		computeSets.Clear();
+
+		foreach (var upload in uploadBuffers)
+			upload.Resource.Destroy();
+
+		uploadBuffers.Clear();
 		recording = false;
 		finished = false;
 		disposed = true;
+	}
+
+	private sealed class UploadBuffer(WebGpuSharp.Buffer resource, int capacity)
+	{
+		internal WebGpuSharp.Buffer Resource { get; } = resource;
+		internal byte[] Data { get; } = new byte[capacity];
+		internal int Length { get; set; }
 	}
 }
