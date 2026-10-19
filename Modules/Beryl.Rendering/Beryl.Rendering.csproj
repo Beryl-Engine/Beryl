@@ -10,8 +10,8 @@
   <ItemGroup>
     <PackageReference Include="AssimpNetter" Version="6.0.5" />
     <PackageReference Include="Silk.NET.Windowing" Version="2.23.0" />
-    <PackageReference Include="SlangShaderSharp" Version="2026.13.1" />
-    <PackageReference Include="StbImageSharp" Version="2.30.15" />
+    <PackageReference Include="SlangShaderSharp" Version="2026.18.2" />
+    <PackageReference Include="StbImageSharp" Version="2.30.16" />
   </ItemGroup>
 
   <ItemGroup>
