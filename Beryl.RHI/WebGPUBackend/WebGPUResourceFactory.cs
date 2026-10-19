@@ -102,31 +102,48 @@ internal sealed class WebGPUResourceFactory(WebGPUDevice device) : IResourceFact
 		for (int i = 0; i < entries.Length; i++)
 		{
 			var element = key.Elements[i];
-			if (element.Kind != ResourceKind.UniformBuffer)
-				throw new NotSupportedException($"Unsupported resource kind '{element.Kind}'.");
-			entries[i] = new()
+			var entry = new BindGroupLayoutEntry
 			{
-				Binding = (uint)i,
+				Binding = element.Binding ?? (uint)i,
 				Visibility = ToWebGPU(element.Stages),
-				Buffer = new() { Type = BufferBindingType.Uniform }
 			};
+			switch (element.Kind)
+			{
+				case ResourceKind.UniformBuffer:
+					entry.Buffer = new() { Type = BufferBindingType.Uniform };
+					break;
+				case ResourceKind.TextureReadOnly:
+					entry.Texture = new() { SampleType = TextureSampleType.Float, ViewDimension = TextureViewDimension.D2 };
+					break;
+				case ResourceKind.Sampler:
+					entry.Sampler = new() { Type = SamplerBindingType.Filtering };
+					break;
+				default:
+					throw new NotSupportedException($"Unsupported resource kind '{element.Kind}'.");
+			}
+			entries[i] = entry;
 		}
 
-		return new WebGPUResourceLayout(device.Device.CreateBindGroupLayout(new BindGroupLayoutDescriptor { Entries = entries }), entries.Length);
+		return new WebGPUResourceLayout(device.Device.CreateBindGroupLayout(new BindGroupLayoutDescriptor { Entries = entries }), entries.Select(e => e.Binding).ToArray());
 	}
 
 	/// <inheritdoc/>
 	public IResourceSet CreateResourceSet(ResourceDescriptor key)
 	{
 		var layout = (WebGPUResourceLayout)key.Layout;
-		if (key.BoundResources.Length != layout.Count)
+		if (key.BoundResources.Length != layout.Bindings.Length)
 			throw new ArgumentException("Resource count does not match the layout.", nameof(key));
 
 		BindGroupEntry[] entries = new BindGroupEntry[key.BoundResources.Length];
 		for (int i = 0; i < entries.Length; i++)
 		{
-			var buffer = (WebGPUBuffer)key.BoundResources[i];
-			entries[i] = new() { Binding = (uint)i, Buffer = buffer.Resource, Size = buffer.SizeInBytes };
+			entries[i] = key.BoundResources[i] switch
+			{
+				WebGPUBuffer buffer => new() { Binding = layout.Bindings[i], Buffer = buffer.Resource, Size = buffer.SizeInBytes },
+				WebGPUTextureView texture => new() { Binding = layout.Bindings[i], TextureView = texture.Resource },
+				WebGPUSampler sampler => new() { Binding = layout.Bindings[i], Sampler = sampler.Resource },
+				_ => throw new NotSupportedException($"Unsupported bound resource '{key.BoundResources[i].GetType().Name}'.")
+			};
 		}
 
 		return new WebGPUResourceSet(device.Device.CreateBindGroup(new BindGroupDescriptor { Layout = layout.Resource, Entries = entries }));

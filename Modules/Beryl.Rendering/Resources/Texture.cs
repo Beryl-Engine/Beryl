@@ -24,6 +24,11 @@ public class Texture
 	/// <summary> Sampler settings used when sampling this <see cref="Texture"/>. </summary>
 	public Sampler Sampler { get; }
 
+	#region Defaults
+	/// <summary> A one-pixel opaque white texture. </summary>
+	public static Texture White => new(1, 1, TextureFormat.RGBA8, [255, 255, 255, 255], new Sampler());
+	#endregion
+
 	/// <summary> Creates a new <see cref="Texture"/> with optional pixel data. </summary>
 	/// <param name="width">Texture width in pixels.</param>
 	/// <param name="height">Texture height in pixels.</param>

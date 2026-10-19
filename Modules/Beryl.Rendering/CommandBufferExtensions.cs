@@ -21,6 +21,9 @@ public static class CommandBufferExtensions
 		/// <summary> Sets a constant buffer of name <paramref name="bufferName"/> to <paramref name="data"/>. </summary>
 		public void SetConstantBuffer(string bufferName, ReadOnlySpan<byte> data)
 		{
+			if (data.IsEmpty)
+				return;
+
 			NamedBufferDescriptor key = new(bufferName, (uint)data.Length, BufferUsage.UniformBuffer | BufferUsage.Dynamic);
 			FrameCountedResource<IBuffer> buffer = NamedBufferCache.Instance.GetOrCreate(key);
 
@@ -34,7 +37,7 @@ public static class CommandBufferExtensions
 		}
 
 		/// <summary> Binds a shader's resources. </summary>
-		public void BindShaderResources(Shader shader, bool compute = false)
+		public void BindShaderResources(Shader shader, bool compute = false, Material? material = null)
 		{
 			foreach (var group in shader.ResourceGroups)
 			{
@@ -44,6 +47,20 @@ public static class CommandBufferExtensions
 
 				foreach (var resource in group.Resources)
 				{
+					if (resource.Kind is ResourceKind.TextureReadOnly or ResourceKind.Sampler)
+					{
+						var parameter = resource.Parameters[0];
+						Texture texture = GPUBuffer.GetTexture(material, parameter);
+						if (resource.Kind == ResourceKind.Sampler)
+							boundResources.Array[index++] = SamplerCache.Instance.GetOrCreate(new SamplerDescriptor(texture.Sampler)).Resource;
+						else
+						{
+							var gpuTexture = TextureCache.Instance.GetOrCreate(new TextureDescriptor((uint)texture.Width, (uint)texture.Height, texture.Format, texture.Data));
+							boundResources.Array[index++] = TextureViewCache.Instance.GetOrCreate(new TextureViewDescriptor(gpuTexture.Resource)).Resource;
+						}
+						continue;
+					}
+
 					var buffer = NamedBufferCache.Instance.Get(new NamedBufferDescriptor(resource.Name, resource.SizeInBytes, BufferUsage.UniformBuffer | BufferUsage.Dynamic));
 					if (buffer?.Resource == null)
 					{
@@ -95,7 +112,7 @@ public static class CommandBufferExtensions
 			cmd.SetVertexBuffer(0, renderItem.Resource.VertexBuffer);
 			cmd.SetIndexBuffer(renderItem.Resource.IndexBuffer);
 
-			BindShaderResources(cmd, material.Shader);
+			BindShaderResources(cmd, material.Shader, material: material);
 
 			cmd.DrawIndexed(renderItem.Resource.IndexCount);
 		}

@@ -70,10 +70,10 @@ internal sealed class WebGPUSampler(WebGpuSharp.Sampler resource) : ISampler
 	public void Dispose() => Resource = null!;
 }
 
-internal sealed class WebGPUResourceLayout(BindGroupLayout resource, int count) : IResourceLayout
+internal sealed class WebGPUResourceLayout(BindGroupLayout resource, uint[] bindings) : IResourceLayout
 {
 	internal BindGroupLayout Resource { get; private set; } = resource;
-	internal int Count { get; } = count;
+	internal uint[] Bindings { get; } = bindings;
 
 	/// <inheritdoc/>
 	public void Dispose() => Resource = null!;

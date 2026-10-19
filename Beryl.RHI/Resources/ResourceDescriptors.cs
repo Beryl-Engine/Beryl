@@ -66,6 +66,7 @@ public readonly ref struct ComputePipelineDescriptor(ShaderDescriptor shader, Re
 				hash.Add(element.Name);
 				hash.Add(element.Kind);
 				hash.Add(element.Stages);
+				hash.Add(element.Binding);
 			}
 		}
 		return hash.ToHashCode();
@@ -100,6 +101,7 @@ public readonly ref struct PipelineDescriptor(string passName, ShaderDescriptor 
 				hash.Add(element.Name);
 				hash.Add(element.Kind);
 				hash.Add(element.Stages);
+				hash.Add(element.Binding);
 			}
 		}
 		return hash.ToHashCode();
@@ -155,11 +157,12 @@ public readonly ref struct TextureViewDescriptor(ITexture texture) : IAlwaysHash
 	public override int GetHashCode() => RuntimeHelpers.GetHashCode(Texture);
 }
 
-public readonly struct ResourceLayoutElementDescription(string name, ResourceKind kind, ShaderStages stages)
+public readonly struct ResourceLayoutElementDescription(string name, ResourceKind kind, ShaderStages stages, uint? binding = null)
 {
 	public readonly string Name = name;
 	public readonly ResourceKind Kind = kind;
 	public readonly ShaderStages Stages = stages;
+	public readonly uint? Binding = binding;
 }
 
 public readonly ref struct ResourceLayoutDescriptor(ReadOnlySpan<ResourceLayoutElementDescription> elements) : IAlwaysHashable
@@ -178,6 +181,7 @@ public readonly ref struct ResourceLayoutDescriptor(ReadOnlySpan<ResourceLayoutE
 			hash.Add(element.Name);
 			hash.Add(element.Kind);
 			hash.Add(element.Stages);
+			hash.Add(element.Binding);
 		}
 		return hash.ToHashCode();
 	}

@@ -1,6 +1,7 @@
 // This file is part of the Beryl Game Engine.
 // Licensed under the MIT license. (https://github.com/Beryl-Engine/Beryl/blob/main/LICENSE)
 
+using Beryl.Common;
 using Beryl.Common.Utility;
 using Beryl.Math;
 using Beryl.RHI.Resources;
@@ -56,7 +57,7 @@ public sealed class GPUBuffer
 	/// <summary> Adds the parameters of a <see cref="Material"/> to the buffer. </summary>
 	public void AddMaterialParameters(Material mat)
 	{
-		ReadOnlySpan<ShaderParameter> paramSpan = mat.Shader.Resources.First(x => x.Name == "Parameters").Parameters.AsSpan();
+		ReadOnlySpan<ShaderParameter> paramSpan = mat.Shader.MaterialParameters.AsSpan();
 
 		foreach (ref readonly var param in paramSpan)
 		{
@@ -74,8 +75,8 @@ public sealed class GPUBuffer
 					AddSpan(v.Value, v.Value.Length > 2 ? 16 : 8); // Dumb
 					break;
 
-				case { Type: ShaderParameter.ParamType.SampledTexture2D, DefaultValue: ShaderValue.SampledTexture2D text }:
-					// TODO
+				case { Type: ShaderParameter.ParamType.SampledTexture2D }:
+					// Textures and samplers are descriptors, not uniform buffer data.
 					break;
 
 				case { DefaultValue: null }:
@@ -87,6 +88,22 @@ public sealed class GPUBuffer
 					break;
 			}
 		}
+	}
+
+	internal static Texture GetTexture(Material? material, ShaderParameter parameter)
+	{
+		if (material != null && material.TryGetProperty(parameter.Name, out object? value))
+			return value as Texture ?? throw new InvalidCastException($"Parameter '{parameter.Name}' must be a Texture.");
+
+		return GetDefaultTexture(parameter);
+	}
+
+	internal static Texture GetDefaultTexture(ShaderParameter parameter)
+	{
+		if (parameter.DefaultValue is ShaderValue.SampledTexture2D { Path: { } path })
+			return Application.ResourceProvider.GetResource<Texture>(path) ?? Texture.White;
+
+		return Texture.White;
 	}
 
 	public void AddInt(int value) => AddPrimitive(value, 4);

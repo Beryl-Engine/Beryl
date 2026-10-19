@@ -16,7 +16,7 @@ public abstract record ShaderValue
 	public record Float(float Value) : ShaderValue;
 	public record Matrix(params float[] Value) : ShaderValue;
 	public record Vector(params float[] Value) : ShaderValue;
-	public record SampledTexture2D() : ShaderValue;
+	public record SampledTexture2D(string? Path = null) : ShaderValue;
 }
 
 /// <summary>

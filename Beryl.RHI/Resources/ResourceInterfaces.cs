@@ -79,7 +79,9 @@ public enum BufferUsage : byte
 /// </summary>
 public enum ResourceKind : byte
 {
-	UniformBuffer
+	UniformBuffer,
+	TextureReadOnly,
+	Sampler
 }
 
 /// <summary>

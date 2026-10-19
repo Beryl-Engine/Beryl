@@ -56,4 +56,7 @@ public class Material
 
 		throw new InvalidCastException($"Cannot cast parameter '{name}' to type {typeof(T).Name}");
 	}
+
+	/// <summary> Tries to get the value of a property from the material's shader. </summary>
+	public bool TryGetProperty(string name, out object? value) => properties.TryGetValue(name, out value);
 }

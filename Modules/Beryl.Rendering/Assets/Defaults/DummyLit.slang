@@ -11,6 +11,9 @@ SHADER_ATTRIBUTES(
 )
 
 SHADER_PARAMETERS(
+    [DefaultTexture("Assets/Texture.png")]
+    SampledTexture2D<float4> DiffuseMap;
+
     [DefaultFloat3(1, 1, 1)]
     float3 Color;
 
@@ -43,6 +46,7 @@ VertexOutput Vertex(VertexInput i)
     );
 
     o.WorldPosition = worldPos.xyz;
+    o.UV = i.UV;
 
     o.Normal = normalize(mul((float3x3)Object.ModelMatrix, i.Normal));
 
@@ -67,7 +71,7 @@ float4 Fragment(VertexOutput i) : SV_Target
     specular *= step(0.0001, diffuse);
 
     float lighting = ambient + diffuse * Parameters.Intensity;
-    float3 color = Parameters.Color * lighting + Parameters.SpecularColor * specular;
+    float3 color = Parameters.DiffuseMap.Sample(i.UV).rgb * Parameters.Color * lighting + Parameters.SpecularColor * specular;
 
     return float4(color, 1.0);
 }

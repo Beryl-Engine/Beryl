@@ -74,6 +74,7 @@ public class Shader
 			}
 
 			var resources = new List<ShaderResource>();
+			MaterialParameters = ImmutableArray<ShaderParameter>.Empty;
 
 			foreach (var resource in comp.Resources)
 			{
@@ -119,19 +120,46 @@ public class Shader
 								break;
 
 							case "DefaultTexture":
-								defaultValue = new ShaderValue.SampledTexture2D();
+								defaultValue = new ShaderValue.SampledTexture2D(attribute.GetArgumentValueString(0));
 								break;
 						}
 					}
 
-					parameters.Add(new ShaderParameter(@field.Name, type, defaultValue));
+					var parameter = new ShaderParameter(@field.Name, type, defaultValue);
+					parameters.Add(parameter);
+
+					if (type == ShaderParameter.ParamType.SampledTexture2D)
+					{
+						// Slang assigns separate descriptor slots to the wrapper's texture and sampler.
+						for (uint j = 0; j < @field.TypeLayout.FieldCount; j++)
+						{
+							var member = @field.TypeLayout.GetFieldByIndex(j);
+							ResourceKind kind = member.Type.Kind switch
+							{
+								SlangTypeKind.Resource => ResourceKind.TextureReadOnly,
+								SlangTypeKind.SamplerState => ResourceKind.Sampler,
+								_ => throw new NotSupportedException($"Unsupported sampled texture member '{member.Name}'.")
+							};
+							resources.Add(new ShaderResource(
+								$"{resource.Name}.{@field.Name}.{member.Name}", kind,
+								(uint)(resource.GetOffset(SlangParameterCategory.DescriptorTableSlot)
+									+ @field.GetOffset(SlangParameterCategory.DescriptorTableSlot)
+									+ member.GetOffset(SlangParameterCategory.DescriptorTableSlot)),
+								(uint)resource.GetOffset(SlangParameterCategory.SubElementRegisterSpace),
+								[parameter], 0));
+						}
+					}
 				}
+
+				if (resource.Name == "Parameters")
+					MaterialParameters = parameters.ToImmutableArray();
 
 				var elementType = resource.TypeLayout;
 
 				uint size = (uint)elementType.ElementTypeLayout.GetSize(SlangParameterCategory.Uniform);
 
-				resources.Add(new ShaderResource(
+				if (size > 0)
+					resources.Add(new ShaderResource(
 					resource.Name,
 					ResourceKind.UniformBuffer,
 					(uint)resource.GetOffset(SlangParameterCategory.DescriptorTableSlot),
@@ -149,7 +177,7 @@ public class Shader
 					Set = g.Key,
 					Resources = g.OrderBy(r => r.Binding).ToImmutableArray(),
 					LayoutElements = g.OrderBy(r => r.Binding)
-						.Select(r => new ResourceLayoutElementDescription(r.Name, r.Kind, ShaderStages.Vertex | ShaderStages.Fragment | ShaderStages.Compute))
+						.Select(r => new ResourceLayoutElementDescription(r.Name, r.Kind, ShaderStages.Vertex | ShaderStages.Fragment | ShaderStages.Compute, r.Binding))
 						.ToImmutableArray()
 				})
 				.ToImmutableArray();
@@ -169,6 +197,9 @@ public class Shader
 
 	/// <summary> The shader's resource definitions. </summary>
 	public ImmutableArray<ShaderResource> Resources { get; private set; } = ImmutableArray<ShaderResource>.Empty;
+
+	/// <summary> Material parameters, including resources that occupy no uniform buffer space. </summary>
+	public ImmutableArray<ShaderParameter> MaterialParameters { get; private set; } = ImmutableArray<ShaderParameter>.Empty;
 
 	/// <summary> The shader's resource definitions, grouped by set. </summary>
 	public ImmutableArray<ShaderResourceGroup> ResourceGroups { get; private set; }
