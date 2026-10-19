@@ -142,15 +142,15 @@ public class Shader
 
 			Resources = resources.OrderBy(r => r.Set).ThenBy(r => r.Binding).ToImmutableArray();
 
-			var layouts = Resources.Select(r => new ResourceLayoutElementDescription(r.Name, r.Kind, ShaderStages.Vertex | ShaderStages.Fragment | ShaderStages.Compute)).ToImmutableArray();
-
 			ResourceGroups = Resources
 				.GroupBy(r => r.Set)
 				.Select(g => new ShaderResourceGroup
 				{
 					Set = g.Key,
 					Resources = g.OrderBy(r => r.Binding).ToImmutableArray(),
-					LayoutElements = layouts
+					LayoutElements = g.OrderBy(r => r.Binding)
+						.Select(r => new ResourceLayoutElementDescription(r.Name, r.Kind, ShaderStages.Vertex | ShaderStages.Fragment | ShaderStages.Compute))
+						.ToImmutableArray()
 				})
 				.ToImmutableArray();
 

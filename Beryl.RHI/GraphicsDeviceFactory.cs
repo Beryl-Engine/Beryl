@@ -9,12 +9,7 @@ namespace Beryl.RHI;
 public static class GraphicsDeviceFactory
 {
 	/// <summary> Determines whether <paramref name="backend"/> is supported. </summary>
-	public static bool IsBackendSupported(RendererBackend backend) => backend switch
-	{
-		RendererBackend.Vulkan => Veldrith.GraphicsDevice.IsBackendSupported(Veldrith.GraphicsBackend.Vulkan),
-		RendererBackend.Direct3D12 => Veldrith.GraphicsDevice.IsBackendSupported(Veldrith.GraphicsBackend.Direct3D12),
-		_ => false
-	};
+	public static bool IsBackendSupported(RendererBackend backend) => WebGPUBackend.WebGPUDevice.IsBackendSupported(backend);
 
 	/// <summary> Creates a graphics device for <paramref name="backend"/>. </summary>
 	public static IGraphicsDevice Create(RendererBackend backend) => new WebGPUBackend.WebGPUDevice(backend);
