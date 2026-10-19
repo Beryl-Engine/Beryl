@@ -13,6 +13,7 @@ namespace Beryl.Rendering.Resources;
 /// </summary>
 public class Texture
 {
+	/// <summary> The pixel format used by this <see cref="Texture"/>. </summary>
 	public TextureFormat Format { get; }
 
 	public int Width { get; }
