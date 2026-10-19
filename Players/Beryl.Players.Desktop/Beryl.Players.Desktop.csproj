@@ -8,10 +8,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="SixLabors.ImageSharp" Version="4.1.3" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\..\Modules\Beryl.Audio\Beryl.Audio.csproj" />
     <ProjectReference Include="..\..\Modules\Beryl.GUI\Beryl.GUI.csproj" />
     <ProjectReference Include="..\..\Modules\Beryl.Input\Beryl.Input.csproj" />
