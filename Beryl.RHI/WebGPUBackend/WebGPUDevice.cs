@@ -39,13 +39,8 @@ internal sealed class WebGPUDevice : IGraphicsDevice
 	/// <inheritdoc/>
 	public void Initialize(IWindow window)
 	{
-		Instance = WebGPU.CreateInstance();
-		if (Instance == null)
-			throw new Exception("Failed to create WebGPU instance.");
-
-		Surface = CreateSurface(window.Native, Instance);
-		if (Surface == null)
-			throw new Exception("Failed to create surface for window.");
+		Instance = WebGPU.CreateInstance() ?? throw new Exception("Failed to create WebGPU instance.");
+		Surface = CreateSurface(window.Native, Instance) ?? throw new Exception("Failed to create surface for window.");
 
 		BackendType backendType = BackendType.Undefined;
 		switch (backend)
