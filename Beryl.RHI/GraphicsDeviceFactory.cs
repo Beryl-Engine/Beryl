@@ -8,14 +8,24 @@ namespace Beryl.RHI;
 /// </summary>
 public static class GraphicsDeviceFactory
 {
-	/// <summary> Determines whether <paramref name="backend"/> is supported. </summary>
-	public static bool IsBackendSupported(RendererBackend backend) => backend switch
+	/// <summary> Checks platform, runtime and driver support for <paramref name="backend"/>. Window presentation is validated during device initialization. </summary>
+	public static bool IsBackendSupported(RendererBackend backend)
 	{
-		RendererBackend.Vulkan => Veldrith.GraphicsDevice.IsBackendSupported(Veldrith.GraphicsBackend.Vulkan),
-		RendererBackend.Direct3D12 => Veldrith.GraphicsDevice.IsBackendSupported(Veldrith.GraphicsBackend.Direct3D12),
-		_ => false
-	};
+		try
+		{
+			return backend switch
+			{
+				RendererBackend.Vulkan => (OperatingSystem.IsWindows() || OperatingSystem.IsLinux()) && GraphicsBackendSupport.IsVulkanSupported(),
+				RendererBackend.Direct3D12 => OperatingSystem.IsWindowsVersionAtLeast(10) && GraphicsBackendSupport.IsDirect3D12Supported(),
+				_ => false
+			};
+		}
+		catch (Exception exception) when (exception is DllNotFoundException or EntryPointNotFoundException or BadImageFormatException or TypeInitializationException or SharpGen.Runtime.SharpGenException)
+		{
+			return false;
+		}
+	}
 
 	/// <summary> Creates a graphics device for <paramref name="backend"/>. </summary>
-	public static IGraphicsDevice Create(RendererBackend backend) => new VeldrithBackend.VeldrithDevice(backend);
+	public static IGraphicsDevice Create(RendererBackend backend) => new WebGPUBackend.WebGPUDevice(backend);
 }

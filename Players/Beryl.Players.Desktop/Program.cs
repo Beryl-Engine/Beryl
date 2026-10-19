@@ -47,12 +47,6 @@ internal sealed class Program
 			cube.RigidBody.Colliders.Add(new BoxCollider(1, 1, 1));
 
 			ModuleManager.GetModule<SceneModule>()?.CurrentScene.StartAll();
-
-			using var buffer = GPUBufferPool.Shared.RentAuto();
-			buffer.Object.AddInt(10);
-
-			Shader? compute = Application.ResourceProvider.GetResource<Shader>("Assets/Beryl/Compute.slang");
-			compute?.EnqueueDispatch(1, 1, 1, buffer);
 		};
 
 		Application.OnExit += () =>
