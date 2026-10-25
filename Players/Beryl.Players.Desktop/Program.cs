@@ -34,6 +34,14 @@ internal sealed class Program
 
 			FlyController flyController = new();
 
+			Mesh? sponza = Application.ResourceProvider.GetResource<Mesh>("Assets/Sponza.glb");
+			if (sponza != null)
+			{
+				Prop sponzaProp = new() { PhysicsMode = PropPhysicsMode.Static };
+				sponzaProp.Transform.Scale = new Vector3(0.01f, 0.01f, 0.01f);
+				sponzaProp.Renderer.Mesh = sponza;
+			}
+
 			Prop floor = new() { PhysicsMode = PropPhysicsMode.Static };
 			floor.Transform.Scale = new Vector3(10, 1, 10);
 			floor.Renderer.Mesh = Mesh.Plane;

@@ -21,6 +21,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Update="Assets\Sponza.glb">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Update="ProjectInfo.beryl">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

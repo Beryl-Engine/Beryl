@@ -115,16 +115,23 @@ internal sealed class MeshLoader : ResourceLoader<Mesh>
 		if (scene == null || scene.MeshCount == 0)
 			return null;
 
-		var mesh = scene.Meshes[0];
+		List<Vector3> vertices = new();
+		List<Vector3> normals = new();
+		List<uint> indices = new();
 
-		var vertices = mesh.Vertices.Select(v => new Vector3(v.X, v.Y, v.Z)).ToArray();
-		var normals = mesh.Normals.Select(n => new Vector3(n.X, n.Y, n.Z)).ToArray();
-		var indices = mesh.GetIndices();
+		foreach (var mesh in scene.Meshes)
+		{
+			uint vertexOffset = checked((uint)vertices.Count);
+			vertices.AddRange(mesh.Vertices.Select(v => new Vector3(v.X, v.Y, v.Z)));
+			normals.AddRange(mesh.Normals.Select(n => new Vector3(n.X, n.Y, n.Z)));
+
+			indices.AddRange(mesh.GetIndices().Select(i => checked((uint)i + vertexOffset)));
+		}
 
 		Mesh output = new();
-		output.Vertices = vertices;
-		output.Normals = normals;
-		output.Indices = indices.Select(i => unchecked((uint)i)).ToArray();
+		output.Vertices = vertices.ToArray();
+		output.Normals = normals.ToArray();
+		output.Indices = indices.ToArray();
 
 		return output;
 	}
