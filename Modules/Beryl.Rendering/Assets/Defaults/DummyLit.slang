@@ -11,7 +11,7 @@ SHADER_ATTRIBUTES(
 )
 
 SHADER_PARAMETERS(
-    [DefaultTexture("Assets/Texture.png")]
+    [DefaultTexture("Assets/Defaults/White.png")]
     SampledTexture2D<float4> DiffuseMap;
 
     [DefaultFloat3(1, 1, 1)]

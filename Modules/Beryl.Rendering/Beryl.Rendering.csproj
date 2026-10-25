@@ -42,7 +42,7 @@
     <None Update="Assets\Beryl\Core.slang">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="Assets\Texture.png">
+    <None Update="Assets\Defaults\White.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
