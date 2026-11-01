@@ -12,10 +12,9 @@ public class Widget
 {
 	public Rect Rect { get; set; }
 
-	public virtual void Update()
-	{
+	/// <summary> Called when the <see cref="Widget"/> is updated. </summary>
+	public virtual void Update() { }
 
-	}
-
+	/// <summary> Called when the <see cref="Widget"/> requests a draw. </summary>
 	public virtual void Draw(PaintEngine pEngine) => pEngine.DrawRect(Rect, Color.White);
 }

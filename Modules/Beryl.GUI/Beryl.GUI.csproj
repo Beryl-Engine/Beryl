@@ -8,6 +8,17 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\Beryl.Common\Beryl.Common.csproj" />
+    <ProjectReference Include="..\Beryl.Rendering\Beryl.Rendering.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Assets\Defaults\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="Assets\Defaults\Rect.slang">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 </Project>

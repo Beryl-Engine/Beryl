@@ -3,6 +3,7 @@
 
 using Beryl.Common;
 using Beryl.GUI.Widgets;
+using Beryl.Math;
 
 namespace Beryl.GUI;
 
@@ -13,7 +14,7 @@ public class GUIModule : BaseModule
 {
 	public PaintEngine PaintEngine { get; set; } = new();
 
-	public Widget RootWidget { get; set; } = new Widget();
+	public Widget RootWidget { get; set; } = new Widget() { Rect = new Rect(0, 0, 50, 50) };
 
 	/// <inheritdoc/>
 	public override void Initialize() => Application.OnUpdate += Update;
