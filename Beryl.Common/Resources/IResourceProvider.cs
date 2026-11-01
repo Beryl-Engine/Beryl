@@ -10,5 +10,5 @@ public interface IResourceProvider
 {
 	/// <summary> Gets a resource from its path. </summary>
 	/// <returns> The resource or null if invalid. </returns>
-	T? GetResource<T>(string path) where T : class;
+	T? GetResource<T>(string path) where T : Resource;
 }

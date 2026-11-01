@@ -8,7 +8,7 @@ namespace Beryl.Common.Resources.DefaultProvider;
 internal sealed class DefaultResourceProvider : IResourceProvider
 {
 	/// <inheritdoc/>
-	public T? GetResource<T>(string path) where T : class
+	public T? GetResource<T>(string path) where T : Resource
 	{
 		if (!File.Exists(path))
 		{

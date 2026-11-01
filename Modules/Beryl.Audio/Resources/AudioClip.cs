@@ -1,9 +1,11 @@
 // This file is part of the Beryl Game Engine.
 // Licensed under the MIT license. (https://github.com/Beryl-Engine/Beryl/blob/main/LICENSE)
 
+using Beryl.Common.Resources;
+
 namespace Beryl.Audio.Resources;
 
-public class AudioClip
+public class AudioClip : Resource
 {
 	public byte[] Data { get; }
 	public int SampleRate { get; }

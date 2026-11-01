@@ -2,6 +2,7 @@
 // Licensed under the MIT license. (https://github.com/Beryl-Engine/Beryl/blob/main/LICENSE)
 
 using Beryl.Common;
+using Beryl.Common.Resources;
 using Beryl.Common.Resources.DefaultProvider;
 using Beryl.Common.Utility;
 using Beryl.Rendering.Resources.Caches;
@@ -16,7 +17,7 @@ namespace Beryl.Rendering.Resources;
 /// <summary>
 /// Represents a compiled GPU program.
 /// </summary>
-public class Shader
+public class Shader : Resource
 {
 	/// <summary> The <see cref="IShaderDefaultsProvider"/> used by shaders. </summary>
 	/// <remarks> Defaults to <see cref="Rendering.ShaderDefaultsProvider"/>. </remarks>

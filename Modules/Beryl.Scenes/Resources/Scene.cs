@@ -1,6 +1,7 @@
 // This file is part of the Beryl Game Engine.
 // Licensed under the MIT license. (https://github.com/Beryl-Engine/Beryl/blob/main/LICENSE)
 
+using Beryl.Common.Resources;
 using Beryl.Common.Utility;
 using Beryl.Scenes.Entities;
 
@@ -9,7 +10,7 @@ namespace Beryl.Scenes.Resources;
 /// <summary>
 /// A collection of Entities.
 /// </summary>
-public class Scene
+public class Scene : Resource
 {
 	/// <summary> All Entities in the Scene. </summary>
 	public List<Entity> Entities { get; set; } = new();

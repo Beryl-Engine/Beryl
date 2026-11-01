@@ -10,7 +10,7 @@ namespace Beryl.Common.Resources;
 /// <summary>
 /// Contains information and settings for a Beryl project.
 /// </summary>
-public class ProjectInfo
+public class ProjectInfo : Resource
 {
 	/// <summary> The name of the project. </summary>
 	public string Name { get; init; } = Assembly.GetEntryAssembly()?.GetName().Name ?? "New Project";

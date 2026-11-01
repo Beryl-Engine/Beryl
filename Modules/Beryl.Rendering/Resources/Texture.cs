@@ -1,6 +1,7 @@
 // This file is part of the Beryl Game Engine.
 // Licensed under the MIT license. (https://github.com/Beryl-Engine/Beryl/blob/main/LICENSE)
 
+using Beryl.Common.Resources;
 using Beryl.Common.Resources.DefaultProvider;
 using Beryl.RHI.Resources;
 
@@ -11,7 +12,7 @@ namespace Beryl.Rendering.Resources;
 /// <summary>
 /// Represents an image used in a material.
 /// </summary>
-public class Texture
+public class Texture : Resource
 {
 	/// <summary> The pixel format used by this <see cref="Texture"/>. </summary>
 	public TextureFormat Format { get; }

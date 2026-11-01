@@ -2,6 +2,7 @@
 // Licensed under the MIT license. (https://github.com/Beryl-Engine/Beryl/blob/main/LICENSE)
 
 using Beryl.Common;
+using Beryl.Common.Resources;
 
 namespace Beryl.Rendering.Resources;
 
@@ -9,7 +10,7 @@ namespace Beryl.Rendering.Resources;
 /// Represents the visual appearance of a mesh by using a <see cref="Resources.Shader"/>
 /// and its associated parameters, such as textures, colors, and numerical values.
 /// </summary>
-public class Material
+public class Material : Resource
 {
 	/// <summary> The GPU <see cref="Resources.Shader"/> used by the material. </summary>
 	public Shader Shader { get; set; }

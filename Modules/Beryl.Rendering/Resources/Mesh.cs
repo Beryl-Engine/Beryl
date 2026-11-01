@@ -2,7 +2,7 @@
 // Licensed under the MIT license. (https://github.com/Beryl-Engine/Beryl/blob/main/LICENSE)
 
 using Assimp;
-
+using Beryl.Common.Resources;
 using Beryl.Common.Resources.DefaultProvider;
 using Beryl.Math;
 
@@ -11,7 +11,7 @@ namespace Beryl.Rendering.Resources;
 /// <summary>
 /// A Collection of vertices, indices, normals and UVs that form a renderable object.
 /// </summary>
-public class Mesh : IClientRenderable
+public class Mesh : Resource, IClientRenderable
 {
 	/// <summary> The material to use when rendering this mesh. </summary>
 	public Material Material { get; set; } = Material.Default;
