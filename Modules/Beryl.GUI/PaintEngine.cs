@@ -18,10 +18,13 @@ public class PaintEngine
 {
 	private Shader? rectShader;
 
-	/// <summary> Draws the given <see cref="Rect"/> with the given <see cref="Color"/> on the frame this was called from. </summary>
+	/// <summary> Framebuffer pixels per logical unit, set by GUIModule for DPI and user scaling. </summary>
+	public Vector2 CoordinateScale { get; set; } = Vector2.One;
+
+	/// <summary> Queues a rectangle in logical coordinates. </summary>
 	public void DrawRect(Rect rect, Color color)
 	{
-		if (rect.Size.X <= 0 || rect.Size.Y <= 0)
+		if (rect.Size.X <= 0 || rect.Size.Y <= 0 || color.A <= 0)
 			return;
 
 		var viewport = Application.Window.InternalWindow.FramebufferSize;
@@ -36,8 +39,8 @@ public class PaintEngine
 
 		Material material = new(rectShader);
 		material.SetProperty("Color", new ShaderValue.Vector(color.R, color.G, color.B, color.A));
-		material.SetProperty("RectPosition", new ShaderValue.Vector(rect.Position.X, rect.Position.Y));
-		material.SetProperty("RectSize", new ShaderValue.Vector(rect.Size.X, rect.Size.Y));
+		material.SetProperty("RectPosition", new ShaderValue.Vector(rect.Position.X * CoordinateScale.X, rect.Position.Y * CoordinateScale.Y));
+		material.SetProperty("RectSize", new ShaderValue.Vector(rect.Size.X * CoordinateScale.X, rect.Size.Y * CoordinateScale.Y));
 		material.SetProperty("ViewportSize", new ShaderValue.Vector(viewport.X, viewport.Y));
 
 		rendering.QueueObject(new RectRenderable(material), Matrix4x4.Identity);
