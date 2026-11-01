@@ -184,6 +184,7 @@ public class Shader : Resource
 				.ToImmutableArray();
 
 			field = value;
+			ID = Guid.NewGuid();
 		}
 	}
 
@@ -223,7 +224,7 @@ public class Shader : Resource
 		if (!StageBytecode.TryGetValue(ShaderStages.Compute, out byte[]? bytecode))
 			return;
 
-		ShaderDescriptor shaderDescriptor = new(bytecode, ShaderStages.Compute);
+		ShaderDescriptor shaderDescriptor = new(bytecode, ShaderStages.Compute, ID);
 		ComputePipelineDescriptor pipelineDescriptor = new(shaderDescriptor, ResourceGroups.AsSpan());
 		FrameCountedResource<IComputePipeline> pipeline = ComputePipelineCache.Instance.GetOrCreate(pipelineDescriptor);
 

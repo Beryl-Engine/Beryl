@@ -4,6 +4,7 @@
 using Beryl.Common.Resources;
 using Beryl.Common.Resources.DefaultProvider;
 using Beryl.RHI.Resources;
+using System.Collections.Immutable;
 
 using StbImageSharp;
 
@@ -20,7 +21,19 @@ public class Texture : Resource
 	public int Width { get; }
 	public int Height { get; }
 
-	public byte[] Data { get; private set; }
+	/// <summary> The raw pixel data. </summary>
+	public ImmutableArray<byte> Data
+	{
+		get;
+		set
+		{
+			if (value.IsDefault || value.Length != Width * Height * GetPixelSize(Format))
+				throw new ArgumentException("Data length does not match texture size.", nameof(value));
+
+			field = value;
+			ID = Guid.NewGuid();
+		}
+	} = [];
 
 	/// <summary> Sampler settings used when sampling this <see cref="Texture"/>. </summary>
 	public Sampler Sampler { get; }
@@ -38,43 +51,28 @@ public class Texture : Resource
 	public Texture(int width, int height, TextureFormat format, byte[]? initialData = null, Sampler sampler = default)
 	{
 		Format = format;
-		Data = initialData ?? new byte[width * height * GetPixelSize(format)];
 		Width = width;
 		Height = height;
+		Data = (initialData ?? new byte[width * height * GetPixelSize(format)]).ToImmutableArray();
 
 		Sampler = sampler;
-	}
-
-	/// <summary> Sets the raw pixel data. </summary>
-	/// <param name="data">Byte array of pixel data matching texture format.</param>
-	public void SetData(byte[] data)
-	{
-		if (data.Length != Data.Length)
-			throw new ArgumentException("Data length does not match texture size.");
-
-		Data = data;
-	}
-
-	/// <summary> Gets a copy of the raw pixel data. </summary>
-	public byte[] GetData()
-	{
-		byte[] copy = new byte[Data.Length];
-		Array.Copy(Data, copy, Data.Length);
-		return copy;
 	}
 
 	/// <summary> Clears the texture to a specific color. </summary>
 	public void Clear(byte r, byte g, byte b, byte a = 255)
 	{
-		int pixelSize = GetPixelSize(TextureFormat.RGBA8);
+		int pixelSize = GetPixelSize(Format);
+		var data = ImmutableArray.CreateBuilder<byte>(Data.Length);
 
 		for (int i = 0; i < Data.Length; i += pixelSize)
 		{
-			Data[i + 0] = r;
-			Data[i + 1] = g;
-			Data[i + 2] = b;
-			Data[i + 3] = a;
+			data.Add(r);
+			data.Add(g);
+			data.Add(b);
+			if (pixelSize == 4)
+				data.Add(a);
 		}
+		Data = data.MoveToImmutable();
 	}
 
 	private static int GetPixelSize(TextureFormat format)

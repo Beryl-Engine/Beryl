@@ -3,6 +3,7 @@
 
 using Beryl.Math;
 using Beryl.Rendering.Resources;
+using System.Collections.Immutable;
 
 namespace Beryl.Rendering;
 
@@ -11,9 +12,9 @@ namespace Beryl.Rendering;
 /// </summary>
 public interface IClientRenderable
 {
-	Vector3[] Vertices { get; }
-	Vector3[] Normals { get; }
-	Vector2[] UVs { get; }
-	uint[] Indices { get; }
+	ImmutableArray<Vector3> Vertices { get; }
+	ImmutableArray<Vector3> Normals { get; }
+	ImmutableArray<Vector2> UVs { get; }
+	ImmutableArray<uint> Indices { get; }
 	Material Material { get; }
 }

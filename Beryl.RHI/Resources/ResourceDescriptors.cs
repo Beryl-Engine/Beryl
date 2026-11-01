@@ -69,6 +69,7 @@ public readonly ref struct ComputePipelineDescriptor(ShaderDescriptor shader, Re
 				hash.Add(element.Binding);
 			}
 		}
+
 		return hash.ToHashCode();
 	}
 }
@@ -104,6 +105,7 @@ public readonly ref struct PipelineDescriptor(string passName, ShaderDescriptor 
 				hash.Add(element.Binding);
 			}
 		}
+
 		return hash.ToHashCode();
 	}
 }
@@ -126,8 +128,10 @@ public readonly ref struct SamplerDescriptor(Sampler sampler) : IAlwaysHashable
 	}
 }
 
-public readonly ref struct TextureDescriptor(uint width, uint height, TextureFormat format, ReadOnlySpan<byte> data) : IAlwaysHashable
+public readonly ref struct TextureDescriptor(uint width, uint height, TextureFormat format, ReadOnlySpan<byte> data, Guid? resourceID = null) : IAlwaysHashable
 {
+	public readonly Guid? ResourceID = resourceID;
+
 	public readonly uint Width = width;
 	public readonly uint Height = height;
 	public readonly TextureFormat Format = format;
@@ -136,6 +140,9 @@ public readonly ref struct TextureDescriptor(uint width, uint height, TextureFor
 	/// <inheritdoc/>
 	public override int GetHashCode()
 	{
+		if (ResourceID is Guid id)
+			return id.GetHashCode();
+
 		unchecked
 		{
 			int hash = 17;
@@ -204,14 +211,19 @@ public readonly ref struct ResourceDescriptor(IResourceLayout layout, ReadOnlySp
 	}
 }
 
-public readonly ref struct ShaderDescriptor(ReadOnlySpan<byte> bytecode, ShaderStages stage) : IAlwaysHashable
+public readonly ref struct ShaderDescriptor(ReadOnlySpan<byte> bytecode, ShaderStages stage, Guid? resourceID = null) : IAlwaysHashable
 {
+	public readonly Guid? ResourceID = resourceID;
+
 	public readonly ReadOnlySpan<byte> Bytecode = bytecode;
 	public readonly ShaderStages Stage = stage;
 
 	/// <inheritdoc/>
 	public override int GetHashCode()
 	{
+		if (ResourceID is Guid id)
+			return HashCode.Combine(id, Stage);
+
 		// We cant hash all the bytecode because that would be VERY expensive so we just hash the first and last 16 bytes
 		// This will cause collisions in the future!!!!!! someone who knows what theyre doing: help !!!!!!
 		var hash = new HashCode();

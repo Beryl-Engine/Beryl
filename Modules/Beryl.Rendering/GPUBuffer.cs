@@ -54,6 +54,9 @@ public sealed class GPUBuffer
 	private byte[] data = new byte[DEFAULT_SIZE];
 	private int offset = 0;
 
+	// Keep each defaults resource ID stable whilst its shader parameter is active
+	private static readonly ConditionalWeakTable<ShaderParameter, Texture> defaultTextures = new();
+
 	/// <summary> Adds the parameters of a <see cref="Material"/> to the buffer. </summary>
 	public void AddMaterialParameters(Material mat)
 	{
@@ -76,7 +79,7 @@ public sealed class GPUBuffer
 					break;
 
 				case { Type: ShaderParameter.ParamType.SampledTexture2D }:
-					// Textures and samplers are descriptors, not uniform buffer data.
+					// Textures and samplers are descriptors
 					break;
 
 				case { DefaultValue: null }:
@@ -98,13 +101,13 @@ public sealed class GPUBuffer
 		return GetDefaultTexture(parameter);
 	}
 
-	internal static Texture GetDefaultTexture(ShaderParameter parameter)
+	internal static Texture GetDefaultTexture(ShaderParameter parameter) => defaultTextures.GetValue(parameter, static parameter =>
 	{
 		if (parameter.DefaultValue is ShaderValue.SampledTexture2D { Path: { } path })
 			return Application.ResourceProvider.GetResource<Texture>(path) ?? Texture.White;
 
 		return Texture.White;
-	}
+	});
 
 	public void AddInt(int value) => AddPrimitive(value, 4);
 

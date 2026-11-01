@@ -2,6 +2,7 @@
 // Licensed under the MIT license. (https://github.com/Beryl-Engine/Beryl/blob/main/LICENSE)
 
 using Beryl.Common.Standard;
+using Beryl.Common.Resources;
 using Beryl.Common.Utility;
 using Beryl.Math;
 using Beryl.RHI;
@@ -55,7 +56,7 @@ public static class CommandBufferExtensions
 							boundResources.Array[index++] = SamplerCache.Instance.GetOrCreate(new SamplerDescriptor(texture.Sampler)).Resource;
 						else
 						{
-							var gpuTexture = TextureCache.Instance.GetOrCreate(new TextureDescriptor((uint)texture.Width, (uint)texture.Height, texture.Format, texture.Data));
+							var gpuTexture = TextureCache.Instance.GetOrCreate(new TextureDescriptor((uint)texture.Width, (uint)texture.Height, texture.Format, texture.Data.AsSpan(), texture.ID));
 							boundResources.Array[index++] = TextureViewCache.Instance.GetOrCreate(new TextureViewDescriptor(gpuTexture.Resource)).Resource;
 						}
 						continue;
@@ -85,7 +86,7 @@ public static class CommandBufferExtensions
 
 
 		/// <summary> Draws a mesh. </summary>
-		public void DrawImmediate(ReadOnlySpan<Vector3> vertices, ReadOnlySpan<Vector3> normals, ReadOnlySpan<Vector2> uvs, ReadOnlySpan<uint> indices, Matrix4x4 transform, Material material)
+		public void DrawImmediate(ReadOnlySpan<Vector3> vertices, ReadOnlySpan<Vector3> normals, ReadOnlySpan<Vector2> uvs, ReadOnlySpan<uint> indices, Matrix4x4 transform, Material material, Guid? resourceID = null)
 		{
 			if (cmd.CurrentFramebuffer == null)
 			{
@@ -98,15 +99,15 @@ public static class CommandBufferExtensions
 
 			var pipelineKey = new PipelineDescriptor(
 				passName: material.Shader.Pass,
-				vertShader: new ShaderDescriptor(material.Shader.StageBytecode[ShaderStages.Vertex], ShaderStages.Vertex),
-				fragShader: new ShaderDescriptor(material.Shader.StageBytecode[ShaderStages.Fragment], ShaderStages.Fragment),
+				vertShader: new ShaderDescriptor(material.Shader.StageBytecode[ShaderStages.Vertex], ShaderStages.Vertex, material.Shader.ID),
+				fragShader: new ShaderDescriptor(material.Shader.StageBytecode[ShaderStages.Fragment], ShaderStages.Fragment, material.Shader.ID),
 				output: cmd.CurrentFramebuffer,
 				resourceGroups: material.Shader.ResourceGroups.AsSpan(),
 				cullingMode: material.Shader.CullingMode,
 				depthInfo: new DepthInfo(material.Shader.DepthWrite, material.Shader.DepthComparison)
 			);
 
-			FrameCountedResource<RenderItem> renderItem = RenderItemCache.Instance.GetOrCreate(new RenderItemKey(vertices, normals, uvs, indices, pipelineKey));
+			FrameCountedResource<RenderItem> renderItem = RenderItemCache.Instance.GetOrCreate(new RenderItemKey(vertices, normals, uvs, indices, pipelineKey, resourceID));
 
 			cmd.SetPipeline(renderItem.Resource.Pipeline.Resource);
 			cmd.SetVertexBuffer(0, renderItem.Resource.VertexBuffer);
@@ -118,6 +119,6 @@ public static class CommandBufferExtensions
 		}
 
 		/// <summary> Draws a <see cref="IClientRenderable"/> with the given transform <see cref="Matrix4x4"/> and <see cref="Material"/>. </summary>
-		public void DrawImmediate(IClientRenderable renderable, Matrix4x4 transform) => cmd.DrawImmediate(renderable.Vertices, renderable.Normals, renderable.UVs, renderable.Indices, transform, renderable.Material);
+		public void DrawImmediate(IClientRenderable renderable, Matrix4x4 transform) => cmd.DrawImmediate(renderable.Vertices.AsSpan(), renderable.Normals.AsSpan(), renderable.UVs.AsSpan(), renderable.Indices.AsSpan(), transform, renderable.Material, (renderable as Resource)?.ID);
 	}
 }

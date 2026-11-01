@@ -42,8 +42,10 @@ public sealed class RenderItemCache : ResourceCache<RenderItemCache, RenderItemK
 	}
 }
 
-public readonly ref struct RenderItemKey(ReadOnlySpan<Vector3> vertexPositions, ReadOnlySpan<Vector3> vertexNormals, ReadOnlySpan<Vector2> vertexUVs, ReadOnlySpan<uint> indices, PipelineDescriptor pipeline) : IAlwaysHashable
+public readonly ref struct RenderItemKey(ReadOnlySpan<Vector3> vertexPositions, ReadOnlySpan<Vector3> vertexNormals, ReadOnlySpan<Vector2> vertexUVs, ReadOnlySpan<uint> indices, PipelineDescriptor pipeline, Guid? resourceID = null) : IAlwaysHashable
 {
+	public readonly Guid? ResourceID = resourceID;
+
 	public readonly ReadOnlySpan<Vector3> VertexPositions = vertexPositions;
 	public readonly ReadOnlySpan<Vector3> VertexNormals = vertexNormals;
 	public readonly ReadOnlySpan<Vector2> VertexUVs = vertexUVs;
@@ -53,6 +55,9 @@ public readonly ref struct RenderItemKey(ReadOnlySpan<Vector3> vertexPositions, 
 	/// <inheritdoc/>
 	public override int GetHashCode()
 	{
+		if (ResourceID is Guid id)
+			return HashCode.Combine(id, Pipeline.GetHashCode());
+
 		unchecked
 		{
 			int hash = 17;

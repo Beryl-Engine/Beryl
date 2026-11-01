@@ -8,7 +8,7 @@ namespace Beryl.Common.Resources;
 /// </summary>
 public abstract class Resource
 {
-	/// <summary> Unique Identifier for this <see cref="Resource"/>. </summary>
+	/// <summary> Unique Identifier representing the exact state of this <see cref="Resource"/>. </summary>
 	/// <remarks> This is a stable reference per session only. </remarks>
 	public Guid ID { get; protected set; } = Guid.NewGuid();
 }
