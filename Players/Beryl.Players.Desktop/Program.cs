@@ -38,18 +38,11 @@ internal sealed class Program
 			if (sponza != null)
 			{
 				Prop sponzaProp = new() { PhysicsMode = PropPhysicsMode.Static };
-				sponzaProp.Transform.Scale = new Vector3(0.01f, 0.01f, 0.01f);
 				sponzaProp.Renderer.Mesh = sponza;
 			}
 
-			Prop floor = new() { PhysicsMode = PropPhysicsMode.Static };
-			floor.Transform.Scale = new Vector3(10, 1, 10);
-			floor.Renderer.Mesh = Mesh.Plane;
-
-			floor.RigidBody.Colliders.Add(new BoxCollider(10, 0.01f, 10));
-
-			Prop cube = new() { PhysicsMode = PropPhysicsMode.Dynamic };
-			cube.Transform.Position = new Vector3(0, 10f, 0);
+			Prop cube = new() { PhysicsMode = PropPhysicsMode.Static };
+			cube.Transform.Position = new Vector3(0, 1f, 0);
 			cube.Renderer.Mesh = Mesh.Cube;
 
 			cube.RigidBody.Colliders.Add(new BoxCollider(1, 1, 1));

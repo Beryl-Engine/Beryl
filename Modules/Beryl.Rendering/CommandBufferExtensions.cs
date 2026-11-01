@@ -52,6 +52,7 @@ public static class CommandBufferExtensions
 					{
 						var parameter = resource.Parameters[0];
 						Texture texture = GPUBuffer.GetTexture(material, parameter);
+
 						if (resource.Kind == ResourceKind.Sampler)
 							boundResources.Array[index++] = SamplerCache.Instance.GetOrCreate(new SamplerDescriptor(texture.Sampler)).Resource;
 						else
@@ -59,6 +60,7 @@ public static class CommandBufferExtensions
 							var gpuTexture = TextureCache.Instance.GetOrCreate(new TextureDescriptor((uint)texture.Width, (uint)texture.Height, texture.Format, texture.Data.AsSpan(), texture.ID));
 							boundResources.Array[index++] = TextureViewCache.Instance.GetOrCreate(new TextureViewDescriptor(gpuTexture.Resource)).Resource;
 						}
+
 						continue;
 					}
 
@@ -85,7 +87,7 @@ public static class CommandBufferExtensions
 		}
 
 
-		/// <summary> Draws a mesh. </summary>
+		/// <summary> Draws a mesh with the given transform <see cref="Matrix4x4"/> and <see cref="Material"/>. </summary>
 		public void DrawImmediate(ReadOnlySpan<Vector3> vertices, ReadOnlySpan<Vector3> normals, ReadOnlySpan<Vector2> uvs, ReadOnlySpan<uint> indices, Matrix4x4 transform, Material material, Guid? resourceID = null)
 		{
 			if (cmd.CurrentFramebuffer == null)
@@ -118,7 +120,18 @@ public static class CommandBufferExtensions
 			cmd.DrawIndexed(renderItem.Resource.IndexCount);
 		}
 
-		/// <summary> Draws a <see cref="IClientRenderable"/> with the given transform <see cref="Matrix4x4"/> and <see cref="Material"/>. </summary>
-		public void DrawImmediate(IClientRenderable renderable, Matrix4x4 transform) => cmd.DrawImmediate(renderable.Vertices.AsSpan(), renderable.Normals.AsSpan(), renderable.UVs.AsSpan(), renderable.Indices.AsSpan(), transform, renderable.Material, (renderable as Resource)?.ID);
+		/// <summary> Draws a full <see cref="IClientRenderable"/> including all submeshes. </summary>
+		public void DrawImmediate(IClientRenderable renderable, Matrix4x4 transform)
+		{
+			if (renderable is Mesh { SubMeshes.IsEmpty: false } mesh)
+			{
+				foreach (var part in mesh.SubMeshes)
+					cmd.DrawImmediate(part, transform);
+
+				return;
+			}
+
+			cmd.DrawImmediate(renderable.Vertices.AsSpan(), renderable.Normals.AsSpan(), renderable.UVs.AsSpan(), renderable.Indices.AsSpan(), transform, renderable.Material, (renderable as Resource)?.ID);
+		}
 	}
 }

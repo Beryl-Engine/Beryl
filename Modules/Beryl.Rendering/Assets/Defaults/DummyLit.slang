@@ -17,7 +17,7 @@ SHADER_PARAMETERS(
     [DefaultFloat3(1, 1, 1)]
     float3 Color;
 
-    [DefaultFloat(0.6)]
+    [DefaultFloat(1.0)]
     float Intensity;
 
     [DefaultFloat3(0.4, 0.7, 0.5)]

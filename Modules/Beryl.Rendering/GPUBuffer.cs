@@ -64,25 +64,26 @@ public sealed class GPUBuffer
 
 		foreach (ref readonly var param in paramSpan)
 		{
-			switch (param)
+			object? value = mat.TryGetProperty(param.Name, out object? property) ? property : param.DefaultValue;
+			switch (param.Type, value)
 			{
-				case { Type: ShaderParameter.ParamType.Float, DefaultValue: ShaderValue.Float f }:
+				case (ShaderParameter.ParamType.Float, ShaderValue.Float f):
 					AddFloat(f.Value);
 					break;
 
-				case { Type: ShaderParameter.ParamType.Int, DefaultValue: ShaderValue.Int i }:
+				case (ShaderParameter.ParamType.Int, ShaderValue.Int i):
 					AddInt(i.Value);
 					break;
 
-				case { Type: ShaderParameter.ParamType.Vector, DefaultValue: ShaderValue.Vector v }:
+				case (ShaderParameter.ParamType.Vector, ShaderValue.Vector v):
 					AddSpan(v.Value, v.Value.Length > 2 ? 16 : 8); // Dumb
 					break;
 
-				case { Type: ShaderParameter.ParamType.SampledTexture2D }:
+				case (ShaderParameter.ParamType.SampledTexture2D, _):
 					// Textures and samplers are descriptors
 					break;
 
-				case { DefaultValue: null }:
+				case (_, null):
 					BerylConsole.Warning($"Parameter has no default value: {param.Name} ({param.Type})");
 					break;
 
